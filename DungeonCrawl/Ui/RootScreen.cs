@@ -18,7 +18,6 @@ public class RootScreen : ScreenObject
     public RootScreen()
     {
         _map = new Map(Game.Instance.ScreenCellsX, Game.Instance.ScreenCellsY - 5);
-
         Children.Add(_map.SurfaceObject);
     }
 

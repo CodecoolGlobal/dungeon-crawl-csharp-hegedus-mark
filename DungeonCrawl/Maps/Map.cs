@@ -29,14 +29,21 @@ public class Map
         _mapSurface.UseMouse = false;
 
         UserControlledObject = new Player(_mapSurface.Surface.Area.Center, _mapSurface);
+    }
 
-        // Create 5 treasure tiles and 5 monster tiles
-        for (int i = 0; i < 5; i++)
+    public void DrawElementsOnConsole(int treasure, int monster)
+    {
+        for (int i = 0; i < treasure; i++)
         {
             CreateTreasure();
+        }
+        for (int i = 0; i < monster; i++)
+        {
             CreateMonster();
         }
+
     }
+    
 
     /// <summary>
     /// Try to find a map object at that position.
