@@ -15,6 +15,7 @@ public class Map
     public IReadOnlyList<GameObject> GameObjects => _mapObjects.AsReadOnly();
     public ScreenSurface SurfaceObject => _mapSurface;
     public Player UserControlledObject { get; private set; }
+    private List<GameObject> _monsters => _mapObjects.Where(item => item is Monster).ToList();
     private List<GameObject> _mapObjects;
     private List<GameObject> monsters => _mapObjects.Where(item => item is Monster).ToList();
     private ScreenSurface _mapSurface;
@@ -52,9 +53,9 @@ public class Map
     }
     public void MoveProjectiles()
     {
-        List<Shooting> Shoots = _mapObjects.OfType<Shooting>().ToList();
+        List<Projectile> Shoots = _mapObjects.OfType<Projectile>().ToList();
 
-        foreach (Shooting shoot in Shoots)
+        foreach (Projectile shoot in Shoots)
         {
             bool hit = shoot.Move(this);
             if (hit)
@@ -275,3 +276,4 @@ public class Map
         }
     }
 }
+

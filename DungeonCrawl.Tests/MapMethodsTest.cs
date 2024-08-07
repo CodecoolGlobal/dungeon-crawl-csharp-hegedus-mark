@@ -2,8 +2,8 @@ using DungeonCrawl.Maps;
 using DungeonCrawl.Tiles;
 using DungeonCrawl.Ui;
 using SadConsole;
-using SadConsole.Configuration;
-using Game = SadConsole.Game;
+using Game = SadConsole.Host.Game;
+
 namespace DungeonCrawl.Tests;
 
 public class Tests
@@ -13,10 +13,8 @@ public class Tests
     [SetUp]
     public void Setup()
     {
-        Builder startup = new Builder()
-            .SetScreenSize(80, 25)
-            .SetStartingScreen<RootScreen>()
-            .IsStartingScreenFocused(true);
+        map = new Map(80, 25);
+    }
 
         Game.Create(startup);
         Game.Instance.Run();
@@ -26,8 +24,8 @@ public class Tests
     [Test]
     public void DrawElements_Draws_N_Element_On_Console()
     {
-        _map.DrawElementsOnConsole(5,10);
-        var objects = _map.GameObjects;
+        map.DrawElementsOnConsole(5,5);
+        var objects = map.GameObjects;
 
         var monsters = 0;
         var treasures = 0;

@@ -32,7 +32,7 @@ public class Player : GameObject
 
             if (!map.TryGetMapObject(initialPosition, out _))
             {
-                Shooting projectile = new Shooting(initialPosition, Direction.Left, map.SurfaceObject);
+                Projectile projectile = new Projectile(initialPosition, Direction.Left, map.SurfaceObject);
                 map.AddMapObject(projectile);
             }
         }
@@ -45,7 +45,7 @@ public class Player : GameObject
 
             if (!map.TryGetMapObject(initialPosition, out _))
             {
-                Shooting projectile = new Shooting(initialPosition, Direction.Right, map.SurfaceObject);
+                Projectile projectile = new Projectile(initialPosition, Direction.Right, map.SurfaceObject);
                 map.AddMapObject(projectile);
             }
         }
@@ -58,7 +58,7 @@ public class Player : GameObject
 
             if (!map.TryGetMapObject(initialPosition, out _))
             {
-                Shooting projectile = new Shooting(initialPosition, Direction.Up, map.SurfaceObject);
+                Projectile projectile = new Projectile(initialPosition, Direction.Up, map.SurfaceObject);
                 map.AddMapObject(projectile);
             }
         }
@@ -71,7 +71,7 @@ public class Player : GameObject
 
             if (!map.TryGetMapObject(initialPosition, out _))
             {
-                Shooting projectile = new Shooting(initialPosition, Direction.Down, map.SurfaceObject);
+                Projectile projectile = new Projectile(initialPosition, Direction.Down, map.SurfaceObject);
                 map.AddMapObject(projectile);
             }
         }

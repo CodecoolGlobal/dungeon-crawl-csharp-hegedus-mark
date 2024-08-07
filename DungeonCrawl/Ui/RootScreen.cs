@@ -3,6 +3,7 @@ using DungeonCrawl.Maps;
 using SadConsole;
 using SadConsole.Input;
 using SadRogue.Primitives;
+using DungeonCrawl.InventoryServices;
 
 namespace DungeonCrawl.Ui;
 
@@ -12,22 +13,41 @@ namespace DungeonCrawl.Ui;
 public class RootScreen : ScreenObject
 {
     private Map _map;
+    private int counter;
 
     /// <summary>
     /// Constructor.
     /// </summary>
     public RootScreen()
     {
+        var testItem = new Item
+        {
+            ForegroundColor = Color.Beige,
+            GlyphIndex = 6,
+            Name = "Test"
+        };
+
+        var inventory = new Inventory(Game.Instance.ScreenCellsX - 10, 5);
+        inventory.AddItem(testItem);
+        var inventorySurface = inventory.SurfaceObject;
+        inventorySurface.Position = new Point(0, Game.Instance.ScreenCellsY - 5);
+
         _map = new Map(Game.Instance.ScreenCellsX, Game.Instance.ScreenCellsY - 5);
+        _map.DrawElementsOnConsole(5, 5);
+
         Children.Add(_map.SurfaceObject);
+        Children.Add(inventorySurface);
         _map.DrawElementsOnConsole(5, 5);
     }
     public override void Update(TimeSpan timeElapsed)
     {
         base.Update(timeElapsed);
-
+        
+        counter++;
+        System.Console.WriteLine($"Counter: {counter}");
         _map.MoveProjectiles();
     }
+
 
     /// <summary>
     /// Processes keyboard inputs.
@@ -59,12 +79,13 @@ public class RootScreen : ScreenObject
             _map.UserControlledObject.Move(_map.UserControlledObject.Position + Direction.Right, _map);
             handled = true;
         }
+        
 
-        if (keyboard.IsKeyPressed(Keys.Q))
+        if (keyboard.IsKeyPressed(Keys.A))
         {
             _map.UserControlledObject.ShootLeft(_map);
             handled = true;
-        }else if (keyboard.IsKeyPressed(Keys.E))
+        }else if (keyboard.IsKeyPressed(Keys.D))
         {
             _map.UserControlledObject.ShootRight(_map);
             handled = true;
@@ -84,4 +105,5 @@ public class RootScreen : ScreenObject
         }
         return handled;
     }
+    
 }

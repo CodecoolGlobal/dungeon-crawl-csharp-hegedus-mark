@@ -1,4 +1,5 @@
-﻿using DungeonCrawl.Ui;
+﻿using System;
+using DungeonCrawl.Ui;
 using SadConsole;
 using SadConsole.Configuration;
 
@@ -21,10 +22,12 @@ public static class Program
         Builder startup = new Builder()
             .SetScreenSize(ViewPortWidth, ViewPortHeight)
             .SetStartingScreen<RootScreen>()
+            .ConfigureFonts(true)
             .IsStartingScreenFocused(true);
 
         Game.Create(startup);
         Game.Instance.Run();
         Game.Instance.Dispose();
+
     }
 }
