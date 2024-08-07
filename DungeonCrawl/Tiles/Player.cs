@@ -24,58 +24,23 @@ public class Player : GameObject
         _hasWeapon = true;
     }
 
-    public void ShootLeft(Map map)
+    public void Shoot(Direction direction, Map map)
     {
         if (_hasWeapon)
         {
-            Point initialPosition = this.Position + Direction.Left;
+            // Compute the initial position based on the direction
+            Point initialPosition = Position + direction;
 
+            // Check if the position is free of map objects
             if (!map.TryGetMapObject(initialPosition, out _))
             {
-                Projectile projectile = new Projectile(initialPosition, Direction.Left, map.SurfaceObject);
+                // Create and add the projectile to the map
+                Projectile projectile = new Projectile(initialPosition, direction, map.SurfaceObject);
                 map.AddMapObject(projectile);
             }
         }
     }
-    public void ShootRight(Map map)
-    {
-        if (_hasWeapon)
-        {
-            Point initialPosition = this.Position + Direction.Right;
-
-            if (!map.TryGetMapObject(initialPosition, out _))
-            {
-                Projectile projectile = new Projectile(initialPosition, Direction.Right, map.SurfaceObject);
-                map.AddMapObject(projectile);
-            }
-        }
-    }
-    public void ShootUp(Map map)
-    {
-        if (_hasWeapon)
-        {
-            Point initialPosition = this.Position + Direction.Up;
-
-            if (!map.TryGetMapObject(initialPosition, out _))
-            {
-                Projectile projectile = new Projectile(initialPosition, Direction.Up, map.SurfaceObject);
-                map.AddMapObject(projectile);
-            }
-        }
-    }
-    public void ShootDown(Map map)
-    {
-        if (_hasWeapon)
-        {
-            Point initialPosition = this.Position + Direction.Down;
-
-            if (!map.TryGetMapObject(initialPosition, out _))
-            {
-                Projectile projectile = new Projectile(initialPosition, Direction.Down, map.SurfaceObject);
-                map.AddMapObject(projectile);
-            }
-        }
-    }
+    
     protected override bool Touched(GameObject source, Map map)
     {
         if (source is Weapon)

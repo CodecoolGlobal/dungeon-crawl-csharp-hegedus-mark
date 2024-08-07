@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using DungeonCrawl.Maps;
 using SadConsole;
 using SadConsole.Input;
@@ -32,17 +33,18 @@ public class RootScreen : ScreenObject
         var inventorySurface = inventory.SurfaceObject;
         inventorySurface.Position = new Point(0, Game.Instance.ScreenCellsY - 5);
 
-        _map = new Map(Game.Instance.ScreenCellsX, Game.Instance.ScreenCellsY - 5);
+        _map = new Map(Game.Instance.ScreenCellsX, Game.Instance.ScreenCellsY - 5, map1Walls);
         _map.DrawElementsOnConsole(5, 5);
 
         Children.Add(_map.SurfaceObject);
         Children.Add(inventorySurface);
         _map.DrawElementsOnConsole(5, 5);
     }
+
     public override void Update(TimeSpan timeElapsed)
     {
         base.Update(timeElapsed);
-        
+
         counter++;
         System.Console.WriteLine($"Counter: {counter}");
         _map.MoveProjectiles();
@@ -79,31 +81,58 @@ public class RootScreen : ScreenObject
             _map.UserControlledObject.Move(_map.UserControlledObject.Position + Direction.Right, _map);
             handled = true;
         }
-        
+
 
         if (keyboard.IsKeyPressed(Keys.A))
         {
-            _map.UserControlledObject.ShootLeft(_map);
+            _map.UserControlledObject.Shoot(Direction.Left, _map);
             handled = true;
-        }else if (keyboard.IsKeyPressed(Keys.D))
+        }
+        else if (keyboard.IsKeyPressed(Keys.D))
         {
-            _map.UserControlledObject.ShootRight(_map);
+            _map.UserControlledObject.Shoot(Direction.Right, _map);
             handled = true;
-        }else if (keyboard.IsKeyPressed(Keys.W))
+        }
+        else if (keyboard.IsKeyPressed(Keys.W))
         {
-            _map.UserControlledObject.ShootUp(_map);
+            _map.UserControlledObject.Shoot(Direction.Up, _map);
             handled = true;
-        }else if (keyboard.IsKeyPressed(Keys.S))
+        }
+        else if (keyboard.IsKeyPressed(Keys.S))
         {
-            _map.UserControlledObject.ShootDown(_map);
+            _map.UserControlledObject.Shoot(Direction.Down, _map);
             handled = true;
         }
 
-        if (handled)
+        if (false)
         {
             _map.IsPlayerCloseToMonster();
         }
+
         return handled;
     }
-    
+
+
+    private List<(Point, Point)> map1Walls = new List<(Point, Point)>
+    {
+        (new Point(0, 0), new Point(79, 0)),
+        (new Point(0, 1), new Point(0, 19)),
+        (new Point(0, 19), new Point(79, 19)),
+        (new Point(79, 0), new Point(79, 19)),
+
+        (new Point(5, 2), new Point(5, 15)),
+        (new Point(15, 4), new Point(15, 17)),
+        (new Point(25, 2), new Point(25, 15)),
+        (new Point(35, 4), new Point(35, 17)),
+        (new Point(45, 2), new Point(45, 15)),
+        (new Point(55, 4), new Point(55, 17)),
+        (new Point(65, 2), new Point(65, 15)),
+
+        (new Point(10, 3), new Point(20, 3)),
+        (new Point(30, 6), new Point(40, 6)),
+        (new Point(50, 9), new Point(60, 9)),
+        (new Point(10, 12), new Point(20, 12)),
+        (new Point(30, 15), new Point(40, 15)),
+        (new Point(50, 18), new Point(60, 18)),
+    };
 }
