@@ -1,4 +1,5 @@
-﻿using SadConsole;
+﻿using DungeonCrawl.Maps;
+using SadConsole;
 using SadRogue.Primitives;
 
 namespace DungeonCrawl.Tiles;
@@ -17,4 +18,5 @@ public class Player : GameObject
         : base(new ColoredGlyph(Color.Green, Color.Transparent, 2), position, hostingSurface)
     {
     }
+    
 }

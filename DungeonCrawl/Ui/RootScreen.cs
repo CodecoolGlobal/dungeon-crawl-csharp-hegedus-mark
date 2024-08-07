@@ -1,4 +1,5 @@
-﻿using DungeonCrawl.Maps;
+﻿using System;
+using DungeonCrawl.Maps;
 using SadConsole;
 using SadConsole.Input;
 using SadRogue.Primitives;
@@ -19,6 +20,7 @@ public class RootScreen : ScreenObject
     {
         _map = new Map(Game.Instance.ScreenCellsX, Game.Instance.ScreenCellsY - 5);
         Children.Add(_map.SurfaceObject);
+        _map.DrawElementsOnConsole(5, 5);
     }
 
     /// <summary>
@@ -52,6 +54,10 @@ public class RootScreen : ScreenObject
             handled = true;
         }
 
+        if (handled)
+        {
+            _map.IsPlayerCloseToMonster();
+        }
         return handled;
     }
 }

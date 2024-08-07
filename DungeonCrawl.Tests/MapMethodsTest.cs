@@ -21,7 +21,6 @@ public class Tests
         Game.Create(startup);
         Game.Instance.Run();
         _map = new Map(80, 25);
-        Game.Instance.Dispose();
     }
 
     [Test]

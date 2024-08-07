@@ -1,4 +1,5 @@
-﻿using DungeonCrawl.Tiles;
+﻿using System;
+using DungeonCrawl.Tiles;
 using SadConsole;
 using SadRogue.Primitives;
 using System.Collections.Generic;
@@ -15,7 +16,9 @@ public class Map
     public ScreenSurface SurfaceObject => _mapSurface;
     public Player UserControlledObject { get; private set; }
     private List<GameObject> _mapObjects;
+    private List<GameObject> monsters => _mapObjects.Where(item => item is Monster).ToList();
     private ScreenSurface _mapSurface;
+    private bool dead { get; set; } = false;
 
     /// <summary>
     /// Constructor.
@@ -37,13 +40,13 @@ public class Map
         {
             CreateTreasure();
         }
+
         for (int i = 0; i < monster; i++)
         {
             CreateMonster();
         }
-
     }
-    
+
 
     /// <summary>
     /// Try to find a map object at that position.
@@ -122,6 +125,28 @@ public class Map
             GameObject monster = new Monster(randomPosition, _mapSurface);
             _mapObjects.Add(monster);
             break;
+        }
+    }
+
+    public void IsPlayerCloseToMonster()
+    {
+        int minDistance = 10; // Define the distance within which monsters start moving towards the player
+
+        foreach (var monster in monsters)
+        {
+            // Calculate the direction to move the monster one step closer to the player
+            int moveX = UserControlledObject.Position.X - monster.Position.X;
+            int moveY = UserControlledObject.Position.Y - monster.Position.Y;
+
+            int stepX = moveX != 0 ? moveX / Math.Abs(moveX) : 0;
+            int stepY = moveY != 0 ? moveY/ Math.Abs(moveY) : 0;
+
+            Point newPosition = new Point(monster.Position.X + stepX, monster.Position.Y + stepY);
+
+            if (Math.Abs(moveX) <= minDistance && Math.Abs(moveY) <= minDistance)
+            {
+                monster.Move(newPosition, this);
+            }
         }
     }
 }
