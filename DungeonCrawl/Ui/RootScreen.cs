@@ -38,7 +38,6 @@ public class RootScreen : ScreenObject
 
         Children.Add(_map.SurfaceObject);
         Children.Add(inventorySurface);
-        _map.DrawElementsOnConsole(5, 5);
     }
 
     public override void Update(TimeSpan timeElapsed)
@@ -104,7 +103,7 @@ public class RootScreen : ScreenObject
             handled = true;
         }
 
-        if (false)
+        if (handled)
         {
             _map.IsPlayerCloseToMonster();
         }
@@ -115,7 +114,8 @@ public class RootScreen : ScreenObject
 
     private List<(Point, Point)> map1Walls = new List<(Point, Point)>
     {
-        (new Point(0, 0), new Point(79, 0)),
+        (new Point(0, 0), new Point(37, 0)),
+        (new Point(40,0),new Point(79,0)),
         (new Point(0, 1), new Point(0, 19)),
         (new Point(0, 19), new Point(79, 19)),
         (new Point(79, 0), new Point(79, 19)),
@@ -135,4 +135,15 @@ public class RootScreen : ScreenObject
         (new Point(30, 15), new Point(40, 15)),
         (new Point(50, 18), new Point(60, 18)),
     };
+    
+    public void GameOver()
+    {
+        // Create a new console to display the message
+        var gameOverConsole = new Console(Game.Instance.ScreenCellsX, Game.Instance.ScreenCellsY);
+        gameOverConsole.Print(Game.Instance.ScreenCellsX / 2 - 4, Game.Instance.ScreenCellsY / 2, "Game Over", Color.White);
+        
+        // Replace the current screen with the game over console
+        Game.Instance.Screen = gameOverConsole;
+    }
+    
 }

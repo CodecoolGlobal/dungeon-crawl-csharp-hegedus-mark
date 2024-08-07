@@ -1,8 +1,10 @@
-﻿using System;
+using System;
 using DungeonCrawl.Maps;
+using DungeonCrawl.Ui;
 using SadConsole;
 using SadRogue.Primitives;
 using Game = SadConsole.Host.Game;
+using System;
 
 namespace DungeonCrawl.Tiles;
 
@@ -25,11 +27,13 @@ public class Monster : GameObject
         int attackPoint = 10;
     }
 
-    protected override bool Touched(GameObject source, Map map)
+    public override bool Touched(GameObject source, Map map)
     {
+        // Is the player the one that touched us?
         if (source == map.UserControlledObject)
         {
-            Environment.Exit(0);
+            new RootScreen().GameOver();
+            return true;
         }
 
         if (source is Projectile)
