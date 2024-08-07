@@ -1,10 +1,13 @@
+using System;
 using DungeonCrawl.Maps;
 
-namespace DungeonCrawl.Tiles;
+namespace DungeonCrawl.Tiles.MovableObjects;
 
-public class Projectile : GameObject
+public class Projectile : GameObject, IMovable
 {
     public Direction Direction;
+    public double Speed => throw new NotImplementedException();
+ 
 
     public Projectile(Point position, Direction direction, IScreenSurface hostingSurface)
         : base(new ColoredGlyph(Color.Blue, Color.Transparent, '+'), position, hostingSurface)
@@ -20,6 +23,11 @@ public class Projectile : GameObject
         }
 
         map.RemoveMapObject(this);
+    }
+    
+    public void Update(TimeSpan timeElapsed,  Map map)
+    {
+        return;
     }
 
     /*public  bool Move(Map map)
