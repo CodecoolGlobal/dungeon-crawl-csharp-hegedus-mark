@@ -1,7 +1,9 @@
-﻿using DungeonCrawl.Maps;
+﻿using System;
+using DungeonCrawl.Maps;
 using SadConsole;
 using SadConsole.Input;
 using SadRogue.Primitives;
+using DungeonCrawl.InventoryServices;
 
 namespace DungeonCrawl.Ui;
 
@@ -11,15 +13,33 @@ namespace DungeonCrawl.Ui;
 public class RootScreen : ScreenObject
 {
     private Map _map;
+    private int counter;
 
     /// <summary>
     /// Constructor.
     /// </summary>
     public RootScreen()
     {
+        var testItem = new Item
+        {
+            BackgroundColor = Color.Blue,
+            ForegroundColor = Color.Beige,
+            GlyphIndex = 1,
+            Name = "Test"
+        };
+
+        var inventory = new Inventory(Game.Instance.ScreenCellsX - 10, 5);
+        inventory.AddItem(testItem);
+        var inventorySurface = inventory.SurfaceObject;
+        inventorySurface.Position = new Point(0, Game.Instance.ScreenCellsY - 5);
+
         _map = new Map(Game.Instance.ScreenCellsX, Game.Instance.ScreenCellsY - 5);
+        _map.DrawElementsOnConsole(5, 5);
+
         Children.Add(_map.SurfaceObject);
+        Children.Add(inventorySurface);
     }
+
 
     /// <summary>
     /// Processes keyboard inputs.
@@ -53,5 +73,14 @@ public class RootScreen : ScreenObject
         }
 
         return handled;
+    }
+
+    public override void Update(TimeSpan delta)
+    {
+        base.Update(delta);
+        
+        counter++;
+        System.Console.WriteLine($"Counter: {counter}");
+
     }
 }

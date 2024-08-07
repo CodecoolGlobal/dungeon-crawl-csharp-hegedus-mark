@@ -1,4 +1,5 @@
-﻿using DungeonCrawl.Ui;
+﻿using System;
+using DungeonCrawl.Ui;
 using SadConsole;
 using SadConsole.Configuration;
 
@@ -26,5 +27,6 @@ public static class Program
         Game.Create(startup);
         Game.Instance.Run();
         Game.Instance.Dispose();
+
     }
 }

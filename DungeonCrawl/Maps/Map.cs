@@ -14,6 +14,7 @@ public class Map
     public IReadOnlyList<GameObject> GameObjects => _mapObjects.AsReadOnly();
     public ScreenSurface SurfaceObject => _mapSurface;
     public Player UserControlledObject { get; private set; }
+    private List<GameObject> _monsters => _mapObjects.Where(item => item is Monster).ToList();
     private List<GameObject> _mapObjects;
     private ScreenSurface _mapSurface;
 
