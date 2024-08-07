@@ -16,6 +16,7 @@ public class Map
     public ScreenSurface SurfaceObject => _mapSurface;
     public Player UserControlledObject { get; private set; }
     private List<GameObject> _mapObjects;
+    private List<GameObject> monsters => _mapObjects.Where(item => item is Monster).ToList();
     private ScreenSurface _mapSurface;
 
     /// <summary>
@@ -32,9 +33,17 @@ public class Map
         UserControlledObject = new Player(_mapSurface.Surface.Area.Center, _mapSurface);
         CoordinatesOfWalls();
         // Create 5 treasure tiles and 5 monster tiles
-        for (int i = 0; i < 5; i++)
+    }
+
+    public void DrawElementsOnConsole(int treasure, int monster)
+    {
+        for (int i = 0; i < treasure; i++)
         {
             CreateTreasure();
+        }
+
+        for (int i = 0; i < monster; i++)
+        {
             CreateMonster();
         }
         CreateWeapon();
@@ -59,6 +68,7 @@ public class Map
     {
         _mapObjects.Add(mapObject);
     }
+
 
     /// <summary>
     /// Try to find a map object at that position.
@@ -137,6 +147,28 @@ public class Map
             GameObject monster = new Monster(randomPosition, _mapSurface);
             _mapObjects.Add(monster);
             break;
+        }
+    }
+
+    public void IsPlayerCloseToMonster()
+    {
+        int minDistance = 10; // Define the distance within which monsters start moving towards the player
+
+        foreach (var monster in monsters)
+        {
+            // Calculate the direction to move the monster one step closer to the player
+            int moveX = UserControlledObject.Position.X - monster.Position.X;
+            int moveY = UserControlledObject.Position.Y - monster.Position.Y;
+
+            int stepX = moveX != 0 ? moveX / Math.Abs(moveX) : 0;
+            int stepY = moveY != 0 ? moveY/ Math.Abs(moveY) : 0;
+
+            Point newPosition = new Point(monster.Position.X + stepX, monster.Position.Y + stepY);
+
+            if (Math.Abs(moveX) <= minDistance && Math.Abs(moveY) <= minDistance)
+            {
+                monster.Move(newPosition, this);
+            }
         }
     }
 

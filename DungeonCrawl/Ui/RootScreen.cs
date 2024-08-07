@@ -19,8 +19,8 @@ public class RootScreen : ScreenObject
     public RootScreen()
     {
         _map = new Map(Game.Instance.ScreenCellsX, Game.Instance.ScreenCellsY - 5);
-
         Children.Add(_map.SurfaceObject);
+        _map.DrawElementsOnConsole(5, 5);
     }
     public override void Update(TimeSpan timeElapsed)
     {
@@ -78,6 +78,10 @@ public class RootScreen : ScreenObject
             handled = true;
         }
 
+        if (handled)
+        {
+            _map.IsPlayerCloseToMonster();
+        }
         return handled;
     }
 }
