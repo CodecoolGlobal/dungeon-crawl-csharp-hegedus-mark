@@ -1,9 +1,10 @@
-﻿using System;
+using System;
 using DungeonCrawl.Maps;
 using DungeonCrawl.Ui;
 using SadConsole;
 using SadRogue.Primitives;
 using Game = SadConsole.Host.Game;
+using System;
 
 namespace DungeonCrawl.Tiles;
 
@@ -12,6 +13,8 @@ namespace DungeonCrawl.Tiles;
 /// </summary>
 public class Monster : GameObject
 {
+    public int HealthPoint { get; private set; }
+
     /// <summary>
     /// Constructor.
     /// </summary>
@@ -20,7 +23,7 @@ public class Monster : GameObject
     public Monster(Point position, IScreenSurface hostingSurface)
         : base(new ColoredGlyph(Color.Red, Color.Transparent, 'M'), position, hostingSurface)
     {
-        int healthPoint = 100;
+        HealthPoint = 100;
         int attackPoint = 10;
     }
 
@@ -30,6 +33,13 @@ public class Monster : GameObject
         if (source == map.UserControlledObject)
         {
             new RootScreen().GameOver();
+            return true;
+        }
+
+        if (source is Projectile)
+        {
+            map.RemoveMapObject(source);
+            map.RemoveMapObject(this);
             return true;
         }
 

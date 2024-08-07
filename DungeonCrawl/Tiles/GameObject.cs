@@ -53,6 +53,8 @@ public abstract class GameObject
             }
         }
 
+        var test = new ColoredGlyph(Color.Red, Color.Red);
+        
         // Restore the old cell
         _mapAppearance.CopyAppearanceTo(map.SurfaceObject.Surface[Position]);
 
@@ -75,6 +77,7 @@ public abstract class GameObject
     {
         return false;
     }
+    
 
     /// <summary>
     /// Draws the object on the screen.

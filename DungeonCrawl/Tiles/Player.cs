@@ -1,92 +1,73 @@
-﻿using System;
+using System;
+using System.Linq;
 using DungeonCrawl.Maps;
 using DungeonCrawl.Ui;
 using SadConsole;
 using SadRogue.Primitives;
 
-namespace DungeonCrawl.Tiles;
 
-/// <summary>
-/// Class <c>Player</c> models a user controlled object in the game.
-/// </summary>
-public class Player : GameObject
+namespace DungeonCrawl.Tiles
 {
-    private bool _hasWeapon = false;
-    /// <summary>
-    /// Constructor.
-    /// </summary>
-    /// <param name="position"></param>
-    /// <param name="hostingSurface"></param>
-    public Player(Point position, IScreenSurface hostingSurface)
-        : base(new ColoredGlyph(Color.Green, Color.Transparent, 2), position, hostingSurface)
+    public class Player : GameObject
     {
-    }
-    public void PickUpWeapon()
-    {
-        _hasWeapon = true;
-    }
+        private bool _hasWeapon = false;
+        private bool _hasKey = false;
 
-    public void ShootLeft(Map map)
-    {
-        if (_hasWeapon)
+        public Player(Point position, IScreenSurface hostingSurface)
+            : base(new ColoredGlyph(Color.Green, Color.Transparent, 2), position, hostingSurface)
         {
-            Point initialPosition = this.Position + Direction.Left;
+        }
 
-            if (!map.TryGetMapObject(initialPosition, out _))
+        public void PickUpWeapon()
+        {
+            _hasWeapon = true;
+        }
+
+        public void PickUpKey(Map map)
+        {
+            _hasKey = true;
+            RemoveDoors(map);
+        }
+
+        private void RemoveDoors(Map map)
+        {
+            var doors = map.GameObjects.OfType<Door>().ToList();
+            foreach (var door in doors)
             {
-                Projectile projectile = new Projectile(initialPosition, Direction.Left, map.SurfaceObject);
-                map.AddMapObject(projectile);
+                map.RemoveMapObject(door);
             }
         }
-    }
-    public void ShootRight(Map map)
-    {
-        if (_hasWeapon)
-        {
-            Point initialPosition = this.Position + Direction.Right;
 
-            if (!map.TryGetMapObject(initialPosition, out _))
+        public bool HasKey => _hasKey;
+
+
+        public void Shoot(Direction direction, Map map)
+        {
+            if (_hasWeapon)
             {
-                Projectile projectile = new Projectile(initialPosition, Direction.Right, map.SurfaceObject);
-                map.AddMapObject(projectile);
+                // Compute the initial position based on the direction
+                Point initialPosition = Position + direction;
+
+                // Check if the position is free of map objects
+                if (!map.TryGetMapObject(initialPosition, out _))
+                {
+                    // Create and add the projectile to the map
+                    Projectile projectile = new Projectile(initialPosition, direction, map.SurfaceObject);
+                    map.AddMapObject(projectile);
+                }
             }
         }
-    }
-    public void ShootUp(Map map)
-    {
-        if (_hasWeapon)
-        {
-            Point initialPosition = this.Position + Direction.Up;
 
-            if (!map.TryGetMapObject(initialPosition, out _))
-            {
-                Projectile projectile = new Projectile(initialPosition, Direction.Up, map.SurfaceObject);
-                map.AddMapObject(projectile);
-            }
-        }
-    }
-    public void ShootDown(Map map)
-    {
-        if (_hasWeapon)
+        public override bool Touched(GameObject source, Map map)
         {
-            Point initialPosition = this.Position + Direction.Down;
+            if (source is Weapon)
+            {
+                PickUpWeapon();
+                return true;
+            }
 
-            if (!map.TryGetMapObject(initialPosition, out _))
-            {
-                Projectile projectile = new Projectile(initialPosition, Direction.Down, map.SurfaceObject);
-                map.AddMapObject(projectile);
-            }
+            return false;
         }
-    }
-    public override bool Touched(GameObject source, Map map)
-    {
-        if (source is Monster)
-        {
-            // Signal that the game is over
-            new RootScreen().GameOver();
-            return true;
-        }
-        return false;
     }
     
 }
