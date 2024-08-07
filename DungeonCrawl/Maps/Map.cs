@@ -1,4 +1,5 @@
-﻿using DungeonCrawl.Tiles;
+﻿using System;
+using DungeonCrawl.Tiles;
 using SadConsole;
 using SadRogue.Primitives;
 using System.Collections.Generic;
@@ -16,6 +17,7 @@ public class Map
     public Player UserControlledObject { get; private set; }
     private List<GameObject> _monsters => _mapObjects.Where(item => item is Monster).ToList();
     private List<GameObject> _mapObjects;
+    private List<GameObject> monsters => _mapObjects.Where(item => item is Monster).ToList();
     private ScreenSurface _mapSurface;
 
     /// <summary>
@@ -30,6 +32,8 @@ public class Map
         _mapSurface.UseMouse = false;
 
         UserControlledObject = new Player(_mapSurface.Surface.Area.Center, _mapSurface);
+        CoordinatesOfWalls();
+        // Create 5 treasure tiles and 5 monster tiles
     }
 
     public void DrawElementsOnConsole(int treasure, int monster)
@@ -38,13 +42,34 @@ public class Map
         {
             CreateTreasure();
         }
+
         for (int i = 0; i < monster; i++)
         {
             CreateMonster();
         }
+        CreateWeapon();
 
+        
     }
-    
+    public void MoveProjectiles()
+    {
+        List<Projectile> Shoots = _mapObjects.OfType<Projectile>().ToList();
+
+        foreach (Projectile shoot in Shoots)
+        {
+            bool hit = shoot.Move(this);
+            if (hit)
+            {
+                RemoveMapObject(shoot);
+            }
+        }
+    }
+
+    public void AddMapObject(GameObject mapObject)
+    {
+        _mapObjects.Add(mapObject);
+    }
+
 
     /// <summary>
     /// Try to find a map object at that position.
@@ -125,4 +150,130 @@ public class Map
             break;
         }
     }
+
+    public void IsPlayerCloseToMonster()
+    {
+        int minDistance = 10; // Define the distance within which monsters start moving towards the player
+
+        foreach (var monster in monsters)
+        {
+            // Calculate the direction to move the monster one step closer to the player
+            int moveX = UserControlledObject.Position.X - monster.Position.X;
+            int moveY = UserControlledObject.Position.Y - monster.Position.Y;
+
+            int stepX = moveX != 0 ? moveX / Math.Abs(moveX) : 0;
+            int stepY = moveY != 0 ? moveY/ Math.Abs(moveY) : 0;
+
+            Point newPosition = new Point(monster.Position.X + stepX, monster.Position.Y + stepY);
+
+            if (Math.Abs(moveX) <= minDistance && Math.Abs(moveY) <= minDistance)
+            {
+                monster.Move(newPosition, this);
+            }
+        }
+    }
+
+    private void CreateWeapon()
+    {
+        for (int i = 0; i < 1000; i++)
+        {
+            // Get a random position
+            Point randomPosition = new Point(Game.Instance.Random.Next(0, _mapSurface.Surface.Width),
+                Game.Instance.Random.Next(0, _mapSurface.Surface.Height));
+
+            // Check if any object is already positioned there, repeat the loop if found
+            bool foundObject = _mapObjects.Any(obj => obj.Position == randomPosition);
+            if (foundObject) continue;
+
+            // If the code reaches here, we've got a good position, create the game object.
+            GameObject Weapon = new Weapon(randomPosition, _mapSurface);
+            _mapObjects.Add(Weapon);
+            break;
+        }
+    }
+
+    private void CreateWall(Point Start, Point End)
+    {
+        bool isHorizontal = Start.Y == End.Y;
+        bool isVertical = Start.X == End.X;
+
+        if (isHorizontal)
+        {
+            int minX = Math.Min(Start.X, End.X);
+            int maxX = Math.Max(Start.X, End.X);
+            for (int i = minX; i <= maxX; i++)
+            {
+                Point position = new Point(i, Start.Y);
+                if (!_mapObjects.Any(o => o.Position == position))
+                {
+                    GameObject Wall = new Wall(position, _mapSurface);
+                    _mapObjects.Add(Wall);
+                }
+            }
+        }
+
+        if (isVertical)
+        {
+            int minY = Math.Min(Start.Y, End.Y);
+            int maxY = Math.Max(Start.Y, End.Y);
+            for (int i = minY; i <= maxY; i++)
+            {
+                Point position = new Point(Start.X, i);
+                if (!_mapObjects.Any(o => o.Position == position))
+                {
+                    GameObject Wall = new Wall(position, _mapSurface);
+                    _mapObjects.Add(Wall);
+                }
+            }
+        }
+    }
+
+    private void CoordinatesOfWalls()
+    {
+        
+        List<(Point, Point)> walls = new List<(Point, Point)>
+        {
+            (new Point(0, 0), new Point(79, 0)),
+            (new Point(0, 1), new Point(0, 19)),
+            (new Point(0, 19), new Point(79, 19)),
+            (new Point(79, 0), new Point(79, 19)),
+            
+           /* (new Point(10, 2), new Point(10, 17)),
+            (new Point(20, 2), new Point(20, 17)),
+            (new Point(30, 5), new Point(30, 14)),
+            (new Point(40, 2), new Point(40, 17)),
+            (new Point(50, 5), new Point(50, 14)),
+            (new Point(60, 2), new Point(60, 17)),
+            (new Point(70, 2), new Point(70, 17)),
+        
+            (new Point(15, 5), new Point(25, 5)),
+            (new Point(35, 7), new Point(45, 7)),
+            (new Point(55, 10), new Point(65, 10)),
+            (new Point(15, 12), new Point(25, 12)),
+            (new Point(35, 15), new Point(45, 15)), */
+           
+           (new Point(5, 2), new Point(5, 15)),
+           (new Point(15, 4), new Point(15, 17)),
+           (new Point(25, 2), new Point(25, 15)),
+           (new Point(35, 4), new Point(35, 17)),
+           (new Point(45, 2), new Point(45, 15)),
+           (new Point(55, 4), new Point(55, 17)),
+           (new Point(65, 2), new Point(65, 15)),
+        
+           (new Point(10, 3), new Point(20, 3)),
+           (new Point(30, 6), new Point(40, 6)),
+           (new Point(50, 9), new Point(60, 9)),
+           (new Point(10, 12), new Point(20, 12)),
+           (new Point(30, 15), new Point(40, 15)),
+           (new Point(50, 18), new Point(60, 18)),
+            
+            
+        };
+        
+        foreach (var (start, end) in walls)
+        {
+            CreateWall(start, end);
+        }
+    }
 }
+

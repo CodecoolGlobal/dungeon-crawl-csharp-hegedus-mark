@@ -37,6 +37,15 @@ public class RootScreen : ScreenObject
 
         Children.Add(_map.SurfaceObject);
         Children.Add(inventorySurface);
+        _map.DrawElementsOnConsole(5, 5);
+    }
+    public override void Update(TimeSpan timeElapsed)
+    {
+        base.Update(timeElapsed);
+        
+        counter++;
+        System.Console.WriteLine($"Counter: {counter}");
+        _map.MoveProjectiles();
     }
 
 
@@ -72,15 +81,29 @@ public class RootScreen : ScreenObject
         }
         
 
+        if (keyboard.IsKeyPressed(Keys.A))
+        {
+            _map.UserControlledObject.ShootLeft(_map);
+            handled = true;
+        }else if (keyboard.IsKeyPressed(Keys.D))
+        {
+            _map.UserControlledObject.ShootRight(_map);
+            handled = true;
+        }else if (keyboard.IsKeyPressed(Keys.W))
+        {
+            _map.UserControlledObject.ShootUp(_map);
+            handled = true;
+        }else if (keyboard.IsKeyPressed(Keys.S))
+        {
+            _map.UserControlledObject.ShootDown(_map);
+            handled = true;
+        }
+
+        if (handled)
+        {
+            _map.IsPlayerCloseToMonster();
+        }
         return handled;
     }
-
-    public override void Update(TimeSpan delta)
-    {
-        base.Update(delta);
-        
-        counter++;
-        System.Console.WriteLine($"Counter: {counter}");
-
-    }
+    
 }

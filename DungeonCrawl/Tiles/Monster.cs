@@ -1,5 +1,8 @@
-﻿using SadConsole;
+﻿using System;
+using DungeonCrawl.Maps;
+using SadConsole;
 using SadRogue.Primitives;
+using Game = SadConsole.Host.Game;
 
 namespace DungeonCrawl.Tiles;
 
@@ -16,5 +19,16 @@ public class Monster : GameObject
     public Monster(Point position, IScreenSurface hostingSurface)
         : base(new ColoredGlyph(Color.Red, Color.Transparent, 'M'), position, hostingSurface)
     {
+        int healthPoint = 100;
+        int attackPoint = 10;
+    }
+    
+    protected override bool Touched(GameObject source, Map map)
+    {
+        if (source == map.UserControlledObject)
+        {
+            Environment.Exit(0);
+        }
+        return false;
     }
 }
