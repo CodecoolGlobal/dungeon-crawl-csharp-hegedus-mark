@@ -66,6 +66,12 @@ namespace DungeonCrawl.Tiles
                 return true;
             }
 
+            if (source is Monster)
+            {
+                new RootScreen().GameOver();
+                return false;
+            }
+
             return false;
         }
     }

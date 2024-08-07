@@ -38,7 +38,6 @@ public class RootScreen : ScreenObject
 
         Children.Add(_map.SurfaceObject);
         Children.Add(inventorySurface);
-        _map.DrawElementsOnConsole(5, 5);
     }
 
     public override void Update(TimeSpan timeElapsed)
