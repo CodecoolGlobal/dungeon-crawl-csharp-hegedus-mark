@@ -71,7 +71,7 @@ public abstract class GameObject
     /// <param name="source"></param>
     /// <param name="map"></param>
     /// <returns></returns>
-    protected virtual bool Touched(GameObject source, Map map)
+    public virtual bool Touched(GameObject source, Map map)
     {
         return false;
     }

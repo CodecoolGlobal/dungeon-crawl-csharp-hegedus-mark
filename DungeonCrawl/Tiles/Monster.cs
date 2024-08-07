@@ -1,5 +1,6 @@
 ﻿using System;
 using DungeonCrawl.Maps;
+using DungeonCrawl.Ui;
 using SadConsole;
 using SadRogue.Primitives;
 using Game = SadConsole.Host.Game;
@@ -22,13 +23,16 @@ public class Monster : GameObject
         int healthPoint = 100;
         int attackPoint = 10;
     }
-    
-    protected override bool Touched(GameObject source, Map map)
+
+    public override bool Touched(GameObject source, Map map)
     {
+        // Is the player the one that touched us?
         if (source == map.UserControlledObject)
         {
-            Environment.Exit(0);
+            new RootScreen().GameOver();
+            return true;
         }
+
         return false;
     }
 }

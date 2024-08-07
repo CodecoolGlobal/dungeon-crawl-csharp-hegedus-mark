@@ -106,4 +106,14 @@ public class RootScreen : ScreenObject
         return handled;
     }
     
+    public void GameOver()
+    {
+        // Create a new console to display the message
+        var gameOverConsole = new Console(Game.Instance.ScreenCellsX, Game.Instance.ScreenCellsY);
+        gameOverConsole.Print(Game.Instance.ScreenCellsX / 2 - 4, Game.Instance.ScreenCellsY / 2, "Game Over", Color.White);
+        
+        // Replace the current screen with the game over console
+        Game.Instance.Screen = gameOverConsole;
+    }
+    
 }

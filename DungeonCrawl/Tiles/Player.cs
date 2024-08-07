@@ -1,4 +1,6 @@
-﻿using DungeonCrawl.Maps;
+﻿using System;
+using DungeonCrawl.Maps;
+using DungeonCrawl.Ui;
 using SadConsole;
 using SadRogue.Primitives;
 
@@ -76,14 +78,14 @@ public class Player : GameObject
             }
         }
     }
-    protected override bool Touched(GameObject source, Map map)
+    public override bool Touched(GameObject source, Map map)
     {
-        if (source is Weapon)
+        if (source is Monster)
         {
-            PickUpWeapon();
+            // Signal that the game is over
+            new RootScreen().GameOver();
             return true;
         }
-
         return false;
     }
     
