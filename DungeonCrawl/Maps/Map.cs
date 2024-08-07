@@ -112,6 +112,7 @@ public class Map
         {
             _mapObjects.Remove(mapObject);
             mapObject.RestoreMap(this);
+            _mapSurface.IsDirty = true;
         }
     }
 

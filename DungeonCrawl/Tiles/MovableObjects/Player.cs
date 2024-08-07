@@ -9,7 +9,7 @@ namespace DungeonCrawl.Tiles.MovableObjects
     {
         private bool _hasWeapon = false;
         private bool _hasKey = false;
-        public double Speed => 20;
+        public double Speed => 10;
         public Direction Direction { get; set; }
         public bool Stopped { get; set; } = true;
         private double _accumulatedCell = 0.0;

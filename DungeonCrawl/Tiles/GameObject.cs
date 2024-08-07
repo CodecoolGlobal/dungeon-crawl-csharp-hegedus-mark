@@ -38,7 +38,7 @@ public abstract class GameObject
     /// <param name="newPosition"></param>
     /// <param name="map"></param>
     /// <returns></returns>
-    public bool Move(Point newPosition, Map map)
+    public virtual bool Move(Point newPosition, Map map)
     {
         // Check new position is valid
         if (!map.SurfaceObject.Surface.IsValidCell(newPosition.X, newPosition.Y)) return false;
@@ -52,9 +52,15 @@ public abstract class GameObject
                 return false;
             }
         }
-
         var test = new ColoredGlyph(Color.Red, Color.Red);
-        
+
+        DisplayMoveOnScreen(newPosition, map);
+
+        return true;
+    }
+
+    protected void DisplayMoveOnScreen(Point newPosition, Map map)
+    {
         // Restore the old cell
         _mapAppearance.CopyAppearanceTo(map.SurfaceObject.Surface[Position]);
 
@@ -63,8 +69,6 @@ public abstract class GameObject
 
         Position = newPosition;
         DrawGameObject(map.SurfaceObject);
-
-        return true;
     }
 
     /// <summary>
@@ -77,7 +81,7 @@ public abstract class GameObject
     {
         return false;
     }
-    
+
 
     /// <summary>
     /// Draws the object on the screen.
