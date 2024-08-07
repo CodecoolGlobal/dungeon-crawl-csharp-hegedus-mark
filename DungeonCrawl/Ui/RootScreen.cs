@@ -90,11 +90,6 @@ public class RootScreen : ScreenObject
             ChangeToMap2();
         }
 
-        /*if (handled)
-        {
-            _currentMap.IsPlayerCloseToMonster();
-        }*/
-
         return handled;
     }
 

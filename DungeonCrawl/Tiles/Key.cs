@@ -9,6 +9,7 @@ public class Key : GameObject
         : base(new ColoredGlyph(Color.Yellow, Color.Transparent, 'K'), position, hostingSurface)
     {
     }
+
     public override bool Touched(GameObject source, Map map)
     {
         if (source == map.UserControlledObject)

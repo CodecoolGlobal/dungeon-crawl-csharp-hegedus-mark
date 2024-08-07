@@ -9,6 +9,7 @@ public class Weapon : GameObject
         : base(new ColoredGlyph(Color.Blue, Color.Transparent, 15), position, hostingSurface)
     {
     }
+
     public override bool Touched(GameObject source, Map map)
     {
         if (source == map.UserControlledObject)

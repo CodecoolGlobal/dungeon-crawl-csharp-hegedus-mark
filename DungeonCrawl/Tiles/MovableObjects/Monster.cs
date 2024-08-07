@@ -9,10 +9,11 @@ namespace DungeonCrawl.Tiles.MovableObjects;
 /// </summary>
 public class Monster : GameObject, IMovable
 {
-    public double Speed => 0.5;
+    public double Speed => 5;
     public int HealthPoint { get; private set; }
     private bool _monsterMovementSwitch;
     public Player Player;
+    private double _accumulatedCell = 0.0;
 
     /// <summary>
     /// Constructor.
@@ -46,14 +47,14 @@ public class Monster : GameObject, IMovable
         return false;
     }
 
-    /*public void IsPlayerCloseToMonster()
+    private void IsPlayerCloseToMonster(Map map)
     {
         int minDistance = 10; // Define the distance within which monsters start moving towards the player
 
 
         // Calculate the direction to move the monster one step closer to the player
-        int moveX = Player.Position.X - monster.Position.X;
-        int moveY = Player.Position.Y - monster.Position.Y;
+        int moveX = Player.Position.X - Position.X;
+        int moveY = Player.Position.Y - Position.Y;
 
         int stepX = moveX != 0 ? moveX / Math.Abs(moveX) : 0;
         int stepY = moveY != 0 ? moveY / Math.Abs(moveY) : 0;
@@ -83,20 +84,20 @@ public class Monster : GameObject, IMovable
 
         if (Math.Abs(moveX) <= minDistance && Math.Abs(moveY) <= minDistance)
         {
-            if (monster.Move(newPosition, this))
-            {
-                // Check if the monster has moved to the player's position
-                if (newPosition == UserControlledObject.Position)
-                {
-                    UserControlledObject.Touched(monster, this);
-                }
-            }
+            Move(newPosition, map);
         }
-    }*/
+    }
 
 
     public void Update(TimeSpan timeElapsed, Map map)
     {
-        return;
+        if (_accumulatedCell > 1)
+        {
+            IsPlayerCloseToMonster(map);
+            _accumulatedCell = 0.0;
+            return;
+        }
+
+        _accumulatedCell += Speed * timeElapsed.TotalSeconds;
     }
 }

@@ -57,27 +57,7 @@ public class Map
         CreateKey();
         CreateDoor();
     }
-
-    public void MoveProjectiles()
-    {
-        List<Projectile> projectiles = _mapObjects.OfType<Projectile>().ToList();
-
-        foreach (Projectile projectile in projectiles)
-        {
-            var newPosition = projectile.Position + projectile.Direction;
-
-
-            if (TryGetMapObject(newPosition, out GameObject found))
-            {
-                projectile.HitSomething(found, this);
-            }
-            else
-            {
-                projectile.Move(newPosition, this);
-            }
-        }
-    }
-
+    
 
     public void AddMapObject(GameObject mapObject)
     {
