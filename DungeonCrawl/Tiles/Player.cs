@@ -29,7 +29,7 @@ public class Player : GameObject
         if (_hasWeapon)
         {
             // Compute the initial position based on the direction
-            Point initialPosition = this.Position + direction;
+            Point initialPosition = Position + direction;
 
             // Check if the position is free of map objects
             if (!map.TryGetMapObject(initialPosition, out _))
