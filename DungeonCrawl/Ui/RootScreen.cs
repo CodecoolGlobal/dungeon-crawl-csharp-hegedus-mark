@@ -13,7 +13,8 @@ namespace DungeonCrawl.Ui;
 /// </summary>
 public class RootScreen : ScreenObject
 {
-    private Map _map;
+    private Map _currentMap;
+    private Inventory _inventory;
     private int counter;
 
     /// <summary>
@@ -28,17 +29,37 @@ public class RootScreen : ScreenObject
             Name = "Test"
         };
 
-        var inventory = new Inventory(Game.Instance.ScreenCellsX - 10, 5);
-        inventory.AddItem(testItem);
-        var inventorySurface = inventory.SurfaceObject;
+        _inventory = new Inventory(Game.Instance.ScreenCellsX - 10, 5);
+        _inventory.AddItem(testItem);
+
+        _currentMap = new Map(Game.Instance.ScreenCellsX, Game.Instance.ScreenCellsY - 5, map1Walls, this);
+        _currentMap.DrawElementsOnConsole(5, 5);
+
+        Children.Add(_currentMap.SurfaceObject);
+        LoadInventory();
+    }
+
+    private void LoadInventory()
+    {
+        var inventorySurface = _inventory.SurfaceObject;
         inventorySurface.Position = new Point(0, Game.Instance.ScreenCellsY - 5);
-
-        _map = new Map(Game.Instance.ScreenCellsX, Game.Instance.ScreenCellsY - 5, map1Walls);
-        _map.DrawElementsOnConsole(5, 5);
-
-        Children.Add(_map.SurfaceObject);
         Children.Add(inventorySurface);
-        _map.DrawElementsOnConsole(5, 5);
+    }
+
+    public void ChangeToMap2()
+    {
+        Children.Remove(_currentMap.SurfaceObject);
+        _currentMap = new Map(Game.Instance.ScreenCellsX, Game.Instance.ScreenCellsY - 5, map1Walls, this);
+        _currentMap.DrawElementsOnConsole(1, 20);
+        Children.Add(_currentMap.SurfaceObject);
+    }
+
+    public void ChangeToMap3()
+    {
+        Children.Remove(_currentMap.SurfaceObject);
+        _currentMap = new Map(Game.Instance.ScreenCellsX, Game.Instance.ScreenCellsY - 5, map1Walls, this);
+        _currentMap.DrawElementsOnConsole(1, 20);
+        Children.Add(_currentMap.SurfaceObject);
     }
 
     public override void Update(TimeSpan timeElapsed)
@@ -47,7 +68,7 @@ public class RootScreen : ScreenObject
 
         counter++;
         System.Console.WriteLine($"Counter: {counter}");
-        _map.MoveProjectiles();
+        _currentMap.MoveProjectiles();
     }
 
 
@@ -62,51 +83,60 @@ public class RootScreen : ScreenObject
 
         if (keyboard.IsKeyPressed(Keys.Up))
         {
-            _map.UserControlledObject.Move(_map.UserControlledObject.Position + Direction.Up, _map);
+            _currentMap.UserControlledObject.Move(_currentMap.UserControlledObject.Position + Direction.Up,
+                _currentMap);
             handled = true;
         }
         else if (keyboard.IsKeyPressed(Keys.Down))
         {
-            _map.UserControlledObject.Move(_map.UserControlledObject.Position + Direction.Down, _map);
+            _currentMap.UserControlledObject.Move(_currentMap.UserControlledObject.Position + Direction.Down,
+                _currentMap);
             handled = true;
         }
 
         if (keyboard.IsKeyPressed(Keys.Left))
         {
-            _map.UserControlledObject.Move(_map.UserControlledObject.Position + Direction.Left, _map);
+            _currentMap.UserControlledObject.Move(_currentMap.UserControlledObject.Position + Direction.Left,
+                _currentMap);
             handled = true;
         }
         else if (keyboard.IsKeyPressed(Keys.Right))
         {
-            _map.UserControlledObject.Move(_map.UserControlledObject.Position + Direction.Right, _map);
+            _currentMap.UserControlledObject.Move(_currentMap.UserControlledObject.Position + Direction.Right,
+                _currentMap);
             handled = true;
         }
 
 
         if (keyboard.IsKeyPressed(Keys.A))
         {
-            _map.UserControlledObject.Shoot(Direction.Left, _map);
+            _currentMap.UserControlledObject.Shoot(Direction.Left, _currentMap);
             handled = true;
         }
         else if (keyboard.IsKeyPressed(Keys.D))
         {
-            _map.UserControlledObject.Shoot(Direction.Right, _map);
+            _currentMap.UserControlledObject.Shoot(Direction.Right, _currentMap);
             handled = true;
         }
         else if (keyboard.IsKeyPressed(Keys.W))
         {
-            _map.UserControlledObject.Shoot(Direction.Up, _map);
+            _currentMap.UserControlledObject.Shoot(Direction.Up, _currentMap);
             handled = true;
         }
         else if (keyboard.IsKeyPressed(Keys.S))
         {
-            _map.UserControlledObject.Shoot(Direction.Down, _map);
+            _currentMap.UserControlledObject.Shoot(Direction.Down, _currentMap);
             handled = true;
+        }
+        //For testing purposes
+        if (keyboard.IsKeyPressed(Keys.NumPad1))
+        {
+            ChangeToMap2();
         }
 
         if (false)
         {
-            _map.IsPlayerCloseToMonster();
+            _currentMap.IsPlayerCloseToMonster();
         }
 
         return handled;

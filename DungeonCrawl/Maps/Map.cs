@@ -4,6 +4,7 @@ using SadConsole;
 using SadRogue.Primitives;
 using System.Collections.Generic;
 using System.Linq;
+using DungeonCrawl.Ui;
 
 namespace DungeonCrawl.Maps;
 
@@ -18,14 +19,16 @@ public class Map
     private List<GameObject> _mapObjects;
     private List<GameObject> monsters => _mapObjects.Where(item => item is Monster).ToList();
     private ScreenSurface _mapSurface;
+    private RootScreen _rootScreen;
 
     /// <summary>
     /// Constructor.
     /// </summary>
     /// <param name="mapWidth"></param>
     /// <param name="mapHeight"></param>
-    public Map(int mapWidth, int mapHeight, List<(Point, Point)> walls)
+    public Map(int mapWidth, int mapHeight, List<(Point, Point)> walls, RootScreen rootScreen)
     {
+        _rootScreen = rootScreen;
         _mapObjects = new List<GameObject>();
         _mapSurface = new ScreenSurface(mapWidth, mapHeight);
         _mapSurface.UseMouse = false;
