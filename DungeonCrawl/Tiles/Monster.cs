@@ -1,4 +1,5 @@
-﻿using SadConsole;
+﻿using DungeonCrawl.Maps;
+using SadConsole;
 using SadRogue.Primitives;
 
 namespace DungeonCrawl.Tiles;
@@ -16,5 +17,18 @@ public class Monster : GameObject
     public Monster(Point position, IScreenSurface hostingSurface)
         : base(new ColoredGlyph(Color.Red, Color.Transparent, 'M'), position, hostingSurface)
     {
+    }
+    
+    protected override bool Touched(GameObject source, Map map)
+    {
+        if (source is Shooting)
+        {
+            RestoreMap(map);
+            map.RemoveMapObject(this);
+            return true;
+        }
+        
+
+        return false;
     }
 }

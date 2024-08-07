@@ -25,7 +25,7 @@ public class RootScreen : ScreenObject
     public override void Update(TimeSpan timeElapsed)
     {
         base.Update(timeElapsed);
-
+        _map.UpdateProjectiles();
         _map.MoveProjectiles();
     }
 
