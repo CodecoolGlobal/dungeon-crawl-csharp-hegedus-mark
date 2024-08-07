@@ -1,4 +1,5 @@
-﻿using DungeonCrawl.Maps;
+﻿using System;
+using DungeonCrawl.Maps;
 using SadConsole;
 using SadConsole.Input;
 using SadRogue.Primitives;
@@ -20,6 +21,12 @@ public class RootScreen : ScreenObject
         _map = new Map(Game.Instance.ScreenCellsX, Game.Instance.ScreenCellsY - 5);
 
         Children.Add(_map.SurfaceObject);
+    }
+    public override void Update(TimeSpan timeElapsed)
+    {
+        base.Update(timeElapsed);
+
+        _map.MoveProjectiles();
     }
 
     /// <summary>
@@ -50,6 +57,24 @@ public class RootScreen : ScreenObject
         else if (keyboard.IsKeyPressed(Keys.Right))
         {
             _map.UserControlledObject.Move(_map.UserControlledObject.Position + Direction.Right, _map);
+            handled = true;
+        }
+
+        if (keyboard.IsKeyPressed(Keys.Q))
+        {
+            _map.UserControlledObject.ShootLeft(_map);
+            handled = true;
+        }else if (keyboard.IsKeyPressed(Keys.E))
+        {
+            _map.UserControlledObject.ShootRight(_map);
+            handled = true;
+        }else if (keyboard.IsKeyPressed(Keys.W))
+        {
+            _map.UserControlledObject.ShootUp(_map);
+            handled = true;
+        }else if (keyboard.IsKeyPressed(Keys.S))
+        {
+            _map.UserControlledObject.ShootDown(_map);
             handled = true;
         }
 
