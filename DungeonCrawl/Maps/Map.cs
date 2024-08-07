@@ -1,7 +1,5 @@
 ﻿using System;
 using DungeonCrawl.Tiles;
-using SadConsole;
-using SadRogue.Primitives;
 using System.Collections.Generic;
 using System.Linq;
 using DungeonCrawl.Ui;
@@ -19,6 +17,8 @@ public class Map
     private List<GameObject> _mapObjects;
     private List<GameObject> monsters => _mapObjects.Where(item => item is Monster).ToList();
     private ScreenSurface _mapSurface;
+    private Wall singleWall;
+    private Wall singleWall1;
     private RootScreen _rootScreen;
 
     /// <summary>
@@ -50,6 +50,8 @@ public class Map
         }
 
         CreateWeapon();
+        CreateKey();
+        CreateDoor();
     }
 
     public void MoveProjectiles()
@@ -71,6 +73,7 @@ public class Map
             }
         }
     }
+
 
     public void AddMapObject(GameObject mapObject)
     {
@@ -99,10 +102,6 @@ public class Map
         return false;
     }
 
-    /// <summary>
-    /// Removes an object from the map.
-    /// </summary>
-    /// <param name="mapObject"></param>
     public void RemoveMapObject(GameObject mapObject)
     {
         if (_mapObjects.Contains(mapObject))
@@ -112,51 +111,41 @@ public class Map
         }
     }
 
-    /// <summary>
-    /// Creates a treasure on the map.
-    /// </summary>
     private void CreateTreasure()
     {
-        // Try 1000 times to get an empty map position
         for (int i = 0; i < 1000; i++)
         {
-            // Get a random position
             Point randomPosition = new Point(Game.Instance.Random.Next(0, _mapSurface.Surface.Width),
                 Game.Instance.Random.Next(0, _mapSurface.Surface.Height));
 
-            // Check if any object is already positioned there, repeat the loop if found
             bool foundObject = _mapObjects.Any(obj => obj.Position == randomPosition);
             if (foundObject) continue;
 
-            // If the code reaches here, we've got a good position, create the game object.
+
             GameObject treasure = new Treasure(randomPosition, _mapSurface);
             _mapObjects.Add(treasure);
             break;
         }
     }
 
-    /// <summary>
-    /// Creates a monster on the map.
-    /// </summary>
     private void CreateMonster()
     {
-        // Try 1000 times to get an empty map position
         for (int i = 0; i < 1000; i++)
         {
-            // Get a random position
             Point randomPosition = new Point(Game.Instance.Random.Next(0, _mapSurface.Surface.Width),
                 Game.Instance.Random.Next(0, _mapSurface.Surface.Height));
 
-            // Check if any object is already positioned there, repeat the loop if found
             bool foundObject = _mapObjects.Any(obj => obj.Position == randomPosition);
             if (foundObject) continue;
 
-            // If the code reaches here, we've got a good position, create the game object.
+
             GameObject monster = new Monster(randomPosition, _mapSurface);
             _mapObjects.Add(monster);
             break;
         }
     }
+
+    private bool monsterMovementSwitch = false;
 
     public void IsPlayerCloseToMonster()
     {
@@ -171,11 +160,39 @@ public class Map
             int stepX = moveX != 0 ? moveX / Math.Abs(moveX) : 0;
             int stepY = moveY != 0 ? moveY / Math.Abs(moveY) : 0;
 
+            if (monsterMovementSwitch && Math.Abs(stepX) == 1 && stepY == 0)
+            {
+                stepY = 1;
+            }
+            else if (!monsterMovementSwitch && Math.Abs(stepX) == 1 && stepY == 0)
+            {
+                stepY = -1;
+            }
+
+            if (monsterMovementSwitch && Math.Abs(stepY) == 1 && stepX == 0)
+            {
+                stepX = 1;
+            }
+            else if (!monsterMovementSwitch && Math.Abs(stepY) == 1 && stepX == 0)
+            {
+                stepX = -1;
+            }
+
+            monsterMovementSwitch = !monsterMovementSwitch;
+
             Point newPosition = new Point(monster.Position.X + stepX, monster.Position.Y + stepY);
+
 
             if (Math.Abs(moveX) <= minDistance && Math.Abs(moveY) <= minDistance)
             {
-                monster.Move(newPosition, this);
+                if (monster.Move(newPosition, this))
+                {
+                    // Check if the monster has moved to the player's position
+                    if (newPosition == UserControlledObject.Position)
+                    {
+                        UserControlledObject.Touched(monster, this);
+                    }
+                }
             }
         }
     }
@@ -188,11 +205,9 @@ public class Map
             Point randomPosition = new Point(Game.Instance.Random.Next(0, _mapSurface.Surface.Width),
                 Game.Instance.Random.Next(0, _mapSurface.Surface.Height));
 
-            // Check if any object is already positioned there, repeat the loop if found
             bool foundObject = _mapObjects.Any(obj => obj.Position == randomPosition);
             if (foundObject) continue;
 
-            // If the code reaches here, we've got a good position, create the game object.
             GameObject Weapon = new Weapon(randomPosition, _mapSurface);
             _mapObjects.Add(Weapon);
             break;
@@ -241,5 +256,37 @@ public class Map
         {
             CreateWall(start, end);
         }
+
+        singleWall = new Wall(new Point(37, 1), _mapSurface);
+        singleWall1 = new Wall(new Point(40, 1), _mapSurface);
+        _mapObjects.Add(singleWall);
+        _mapObjects.Add(singleWall1);
+    }
+
+    private void CreateKey()
+    {
+        for (int i = 0; i < 1000; i++)
+        {
+            Point randomPosition = new Point(Game.Instance.Random.Next(0, _mapSurface.Surface.Width),
+                Game.Instance.Random.Next(0, _mapSurface.Surface.Height));
+
+            bool foundObject = _mapObjects.Any(obj => obj.Position == randomPosition);
+            if (foundObject) continue;
+
+
+            GameObject Key = new Key(randomPosition, _mapSurface);
+            _mapObjects.Add(Key);
+            break;
+        }
+    }
+
+    private void CreateDoor()
+    {
+        Point doorPosition = new Point((singleWall.Position.X + singleWall1.Position.X) / 2, singleWall.Position.Y);
+        Point doorPosition1 = new Point(doorPosition.X + 1, singleWall.Position.Y);
+        Door door1 = new Door(doorPosition1, _mapSurface);
+        Door door = new Door(doorPosition, _mapSurface);
+        _mapObjects.Add(door);
+        _mapObjects.Add(door1);
     }
 }

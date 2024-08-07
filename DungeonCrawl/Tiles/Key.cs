@@ -1,10 +1,11 @@
 using DungeonCrawl.Maps;
+
 namespace DungeonCrawl.Tiles;
 
-public class Weapon : GameObject
+public class Key : GameObject
 {
-    public Weapon(Point position, IScreenSurface hostingSurface)
-        : base(new ColoredGlyph(Color.Blue, Color.Transparent, 15), position, hostingSurface)
+    public Key(Point position, IScreenSurface hostingSurface)
+        : base(new ColoredGlyph(Color.Yellow, Color.Transparent, 'K'), position, hostingSurface)
     {
     }
     public override bool Touched(GameObject source, Map map)
@@ -13,7 +14,7 @@ public class Weapon : GameObject
         {
             if (source is Player player)
             {
-                player.PickUpWeapon();
+                player.PickUpKey(map);
             }
             map.RemoveMapObject(this);
             return true;
