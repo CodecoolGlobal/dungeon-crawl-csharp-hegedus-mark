@@ -7,29 +7,48 @@ using System.Linq;
 
 namespace DungeonCrawl.Maps
 {
+
+    /// <summary>
+    /// Class <c>Map</c> models a map for the game.
+    /// </summary>
     public class Map
     {
         public IReadOnlyList<GameObject> GameObjects => _mapObjects.AsReadOnly();
         public ScreenSurface SurfaceObject => _mapSurface;
         public Player UserControlledObject { get; private set; }
         private List<GameObject> _mapObjects;
+        private List<GameObject> monsters => _mapObjects.Where(item => item is Monster).ToList();
         private ScreenSurface _mapSurface;
         private Wall singleWall;
         private Wall singleWall1;
 
-        public Map(int mapWidth, int mapHeight)
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="mapWidth"></param>
+        /// <param name="mapHeight"></param>
+        public Map(int mapWidth, int mapHeight, List<(Point, Point)> walls)
         {
             _mapObjects = new List<GameObject>();
             _mapSurface = new ScreenSurface(mapWidth, mapHeight);
             _mapSurface.UseMouse = false;
 
             UserControlledObject = new Player(_mapSurface.Surface.Area.Center, _mapSurface);
-            CoordinatesOfWalls();
-            for (int i = 0; i < 5; i++)
+            CoordinatesOfWalls(walls);
+        }
+
+        public void DrawElementsOnConsole(int treasure, int monster)
+        {
+            for (int i = 0; i < treasure; i++)
             {
                 CreateTreasure();
+            }
+
+            for (int i = 0; i < monster; i++)
+            {
                 CreateMonster();
             }
+
             CreateWeapon();
             CreateKey();
             CreateDoor();
@@ -37,36 +56,37 @@ namespace DungeonCrawl.Maps
 
         public void MoveProjectiles()
         {
-            List<Shooting> Shoots = _mapObjects.OfType<Shooting>().ToList();
+            List<Projectile> projectiles = _mapObjects.OfType<Projectile>().ToList();
 
-            foreach (Shooting shoot in Shoots)
+            foreach (Projectile projectile in projectiles)
             {
-                bool hit = shoot.Move(this);
-                if (hit)
+                var newPosition = projectile.Position + projectile.Direction;
+
+
+                if (TryGetMapObject(newPosition, out GameObject found))
                 {
-                    RemoveMapObject(shoot);
+                    projectile.HitSomething(found, this);
+                }
+                else
+                {
+                    projectile.Move(newPosition, this);
                 }
             }
         }
 
-        public void UpdateProjectiles()
-        {
-            List<Shooting> projectiles = _mapObjects.OfType<Shooting>().ToList();
-
-            foreach (Shooting projectile in projectiles)
-            {
-                if (projectile.Move(this))
-                {
-                    RemoveMapObject(projectile);
-                }
-            }
-        }
 
         public void AddMapObject(GameObject mapObject)
         {
             _mapObjects.Add(mapObject);
         }
 
+
+        /// <summary>
+        /// Try to find a map object at that position.
+        /// </summary>
+        /// <param name="position"></param>
+        /// <param name="gameObject"></param>
+        /// <returns></returns>
         public bool TryGetMapObject(Point position, out GameObject gameObject)
         {
             foreach (var otherGameObject in _mapObjects)
@@ -100,7 +120,7 @@ namespace DungeonCrawl.Maps
 
                 bool foundObject = _mapObjects.Any(obj => obj.Position == randomPosition);
                 if (foundObject) continue;
-                
+
 
                 GameObject treasure = new Treasure(randomPosition, _mapSurface);
                 _mapObjects.Add(treasure);
@@ -117,7 +137,7 @@ namespace DungeonCrawl.Maps
 
                 bool foundObject = _mapObjects.Any(obj => obj.Position == randomPosition);
                 if (foundObject) continue;
-                
+
 
                 GameObject monster = new Monster(randomPosition, _mapSurface);
                 _mapObjects.Add(monster);
@@ -125,10 +145,34 @@ namespace DungeonCrawl.Maps
             }
         }
 
+
+        public void IsPlayerCloseToMonster()
+        {
+            int minDistance = 10; // Define the distance within which monsters start moving towards the player
+
+            foreach (var monster in monsters)
+            {
+                // Calculate the direction to move the monster one step closer to the player
+                int moveX = UserControlledObject.Position.X - monster.Position.X;
+                int moveY = UserControlledObject.Position.Y - monster.Position.Y;
+
+                int stepX = moveX != 0 ? moveX / Math.Abs(moveX) : 0;
+                int stepY = moveY != 0 ? moveY / Math.Abs(moveY) : 0;
+
+                Point newPosition = new Point(monster.Position.X + stepX, monster.Position.Y + stepY);
+
+                if (Math.Abs(moveX) <= minDistance && Math.Abs(moveY) <= minDistance)
+                {
+                    monster.Move(newPosition, this);
+                }
+            }
+        }
+
         private void CreateWeapon()
         {
             for (int i = 0; i < 1000; i++)
             {
+                // Get a random position
                 Point randomPosition = new Point(Game.Instance.Random.Next(0, _mapSurface.Surface.Width),
                     Game.Instance.Random.Next(0, _mapSurface.Surface.Height));
 
@@ -177,6 +221,20 @@ namespace DungeonCrawl.Maps
             }
         }
 
+        private void CoordinatesOfWalls(List<(Point, Point)> walls)
+        {
+            foreach (var (start, end) in walls)
+            {
+                CreateWall(start, end);
+            }
+
+            singleWall = new Wall(new Point(37, 1), _mapSurface);
+            singleWall1 = new Wall(new Point(40, 1), _mapSurface);
+            _mapObjects.Add(singleWall);
+            _mapObjects.Add(singleWall1);
+
+        }
+
         private void CreateKey()
         {
             for (int i = 0; i < 1000; i++)
@@ -186,7 +244,7 @@ namespace DungeonCrawl.Maps
 
                 bool foundObject = _mapObjects.Any(obj => obj.Position == randomPosition);
                 if (foundObject) continue;
-                
+
 
                 GameObject Key = new Key(randomPosition, _mapSurface);
                 _mapObjects.Add(Key);
@@ -204,41 +262,6 @@ namespace DungeonCrawl.Maps
             _mapObjects.Add(door1);
         }
 
-        private void CoordinatesOfWalls()
-        {
-            List<(Point, Point)> walls = new List<(Point, Point)>
-            {
-                (new Point(0, 0), new Point(37, 0)),
-                (new Point(40, 0), new Point(79, 0)),
-                (new Point(0, 1), new Point(0, 19)),
-                (new Point(0, 19), new Point(79, 19)),
-                (new Point(79, 0), new Point(79, 19)),
-
-                (new Point(5, 2), new Point(5, 15)),
-                (new Point(15, 4), new Point(15, 17)),
-                (new Point(25, 2), new Point(25, 15)),
-                (new Point(35, 4), new Point(35, 17)),
-                (new Point(45, 2), new Point(45, 15)),
-                (new Point(55, 4), new Point(55, 17)),
-                (new Point(65, 2), new Point(65, 15)),
-
-                (new Point(10, 3), new Point(20, 3)),
-                (new Point(30, 6), new Point(40, 6)),
-                (new Point(50, 9), new Point(60, 9)),
-                (new Point(10, 12), new Point(20, 12)),
-                (new Point(30, 15), new Point(40, 15)),
-                (new Point(50, 18), new Point(60, 18)),
-            };
-
-            foreach (var (start, end) in walls)
-            {
-                CreateWall(start, end);
-            }
-
-            singleWall = new Wall(new Point(37, 1), _mapSurface);
-            singleWall1 = new Wall(new Point(40, 1), _mapSurface);
-            _mapObjects.Add(singleWall);
-            _mapObjects.Add(singleWall1);
-        }
+        
     }
 }

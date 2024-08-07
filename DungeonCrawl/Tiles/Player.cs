@@ -36,57 +36,19 @@ namespace DungeonCrawl.Tiles
 
         public bool HasKey => _hasKey;
 
-        public void ShootLeft(Map map)
+
+        public void Shoot(Direction direction, Map map)
         {
             if (_hasWeapon)
             {
-                Point initialPosition = this.Position + Direction.Left;
+                // Compute the initial position based on the direction
+                Point initialPosition = Position + direction;
 
+                // Check if the position is free of map objects
                 if (!map.TryGetMapObject(initialPosition, out _))
                 {
-                    Shooting projectile = new Shooting(initialPosition, Direction.Left, map.SurfaceObject);
-                    map.AddMapObject(projectile);
-                }
-            }
-        }
-
-        public void ShootRight(Map map)
-        {
-            if (_hasWeapon)
-            {
-                Point initialPosition = this.Position + Direction.Right;
-
-                if (!map.TryGetMapObject(initialPosition, out _))
-                {
-                    Shooting projectile = new Shooting(initialPosition, Direction.Right, map.SurfaceObject);
-                    map.AddMapObject(projectile);
-                }
-            }
-        }
-
-        public void ShootUp(Map map)
-        {
-            if (_hasWeapon)
-            {
-                Point initialPosition = this.Position + Direction.Up;
-
-                if (!map.TryGetMapObject(initialPosition, out _))
-                {
-                    Shooting projectile = new Shooting(initialPosition, Direction.Up, map.SurfaceObject);
-                    map.AddMapObject(projectile);
-                }
-            }
-        }
-
-        public void ShootDown(Map map)
-        {
-            if (_hasWeapon)
-            {
-                Point initialPosition = this.Position + Direction.Down;
-
-                if (!map.TryGetMapObject(initialPosition, out _))
-                {
-                    Shooting projectile = new Shooting(initialPosition, Direction.Down, map.SurfaceObject);
+                    // Create and add the projectile to the map
+                    Projectile projectile = new Projectile(initialPosition, direction, map.SurfaceObject);
                     map.AddMapObject(projectile);
                 }
             }
@@ -99,10 +61,8 @@ namespace DungeonCrawl.Tiles
                 PickUpWeapon();
                 return true;
             }
-            
 
             return false;
         }
     }
 }
-
