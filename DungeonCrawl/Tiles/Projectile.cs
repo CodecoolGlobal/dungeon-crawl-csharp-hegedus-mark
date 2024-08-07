@@ -2,11 +2,11 @@ using DungeonCrawl.Maps;
 
 namespace DungeonCrawl.Tiles;
 
-public class Shooting : GameObject
+public class Projectile : GameObject
 {
     private Direction _direction;
     
-    public Shooting(Point position,Direction direction, IScreenSurface hostingSurface)
+    public Projectile(Point position,Direction direction, IScreenSurface hostingSurface)
         : base(new ColoredGlyph(Color.Blue, Color.Transparent, '+'), position, hostingSurface)
     {
         _direction = direction;
