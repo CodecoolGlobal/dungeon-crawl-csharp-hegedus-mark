@@ -22,9 +22,8 @@ public class RootScreen : ScreenObject
     {
         var testItem = new Item
         {
-            BackgroundColor = Color.Blue,
             ForegroundColor = Color.Beige,
-            GlyphIndex = 1,
+            GlyphIndex = 6,
             Name = "Test"
         };
 
@@ -71,6 +70,7 @@ public class RootScreen : ScreenObject
             _map.UserControlledObject.Move(_map.UserControlledObject.Position + Direction.Right, _map);
             handled = true;
         }
+        
 
         return handled;
     }

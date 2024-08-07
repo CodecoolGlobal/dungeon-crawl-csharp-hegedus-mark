@@ -22,6 +22,7 @@ public static class Program
         Builder startup = new Builder()
             .SetScreenSize(ViewPortWidth, ViewPortHeight)
             .SetStartingScreen<RootScreen>()
+            .ConfigureFonts(true)
             .IsStartingScreenFocused(true);
 
         Game.Create(startup);
