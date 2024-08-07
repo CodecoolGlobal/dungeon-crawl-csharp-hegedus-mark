@@ -1,149 +1,149 @@
 ﻿using System;
 using DungeonCrawl.Tiles;
-using SadConsole;
-using SadRogue.Primitives;
 using System.Collections.Generic;
 using System.Linq;
+using DungeonCrawl.Ui;
 
-namespace DungeonCrawl.Maps
+namespace DungeonCrawl.Maps;
+
+/// <summary>
+/// Class <c>Map</c> models a map for the game.
+/// </summary>
+public class Map
 {
+    public IReadOnlyList<GameObject> GameObjects => _mapObjects.AsReadOnly();
+    public ScreenSurface SurfaceObject => _mapSurface;
+    public Player UserControlledObject { get; private set; }
+    private List<GameObject> _mapObjects;
+    private List<GameObject> monsters => _mapObjects.Where(item => item is Monster).ToList();
+    private ScreenSurface _mapSurface;
+    private Wall singleWall;
+    private Wall singleWall1;
+    private RootScreen _rootScreen;
 
     /// <summary>
-    /// Class <c>Map</c> models a map for the game.
+    /// Constructor.
     /// </summary>
-    public class Map
+    /// <param name="mapWidth"></param>
+    /// <param name="mapHeight"></param>
+    public Map(int mapWidth, int mapHeight, List<(Point, Point)> walls, RootScreen rootScreen)
     {
-        public IReadOnlyList<GameObject> GameObjects => _mapObjects.AsReadOnly();
-        public ScreenSurface SurfaceObject => _mapSurface;
-        public Player UserControlledObject { get; private set; }
-        private List<GameObject> _mapObjects;
-        private List<GameObject> monsters => _mapObjects.Where(item => item is Monster).ToList();
-        private ScreenSurface _mapSurface;
-        private Wall singleWall;
-        private Wall singleWall1;
+        _rootScreen = rootScreen;
+        _mapObjects = new List<GameObject>();
+        _mapSurface = new ScreenSurface(mapWidth, mapHeight);
+        _mapSurface.UseMouse = false;
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        /// <param name="mapWidth"></param>
-        /// <param name="mapHeight"></param>
-        public Map(int mapWidth, int mapHeight, List<(Point, Point)> walls)
+        UserControlledObject = new Player(_mapSurface.Surface.Area.Center, _mapSurface);
+        CoordinatesOfWalls(walls);
+    }
+
+    public void DrawElementsOnConsole(int treasure, int monster)
+    {
+        for (int i = 0; i < treasure; i++)
         {
-            _mapObjects = new List<GameObject>();
-            _mapSurface = new ScreenSurface(mapWidth, mapHeight);
-            _mapSurface.UseMouse = false;
-
-            UserControlledObject = new Player(_mapSurface.Surface.Area.Center, _mapSurface);
-            CoordinatesOfWalls(walls);
+            CreateTreasure();
         }
 
-        public void DrawElementsOnConsole(int treasure, int monster)
+        for (int i = 0; i < monster; i++)
         {
-            for (int i = 0; i < treasure; i++)
-            {
-                CreateTreasure();
-            }
-
-            for (int i = 0; i < monster; i++)
-            {
-                CreateMonster();
-            }
-
-            CreateWeapon();
-            CreateKey();
-            CreateDoor();
+            CreateMonster();
         }
 
-        public void MoveProjectiles()
+        CreateWeapon();
+        CreateKey();
+        CreateDoor();
+    }
+
+    public void MoveProjectiles()
+    {
+        List<Projectile> projectiles = _mapObjects.OfType<Projectile>().ToList();
+
+        foreach (Projectile projectile in projectiles)
         {
-            List<Projectile> projectiles = _mapObjects.OfType<Projectile>().ToList();
+            var newPosition = projectile.Position + projectile.Direction;
 
-            foreach (Projectile projectile in projectiles)
+
+            if (TryGetMapObject(newPosition, out GameObject found))
             {
-                var newPosition = projectile.Position + projectile.Direction;
-
-
-                if (TryGetMapObject(newPosition, out GameObject found))
-                {
-                    projectile.HitSomething(found, this);
-                }
-                else
-                {
-                    projectile.Move(newPosition, this);
-                }
+                projectile.HitSomething(found, this);
+            }
+            else
+            {
+                projectile.Move(newPosition, this);
             }
         }
+    }
 
 
-        public void AddMapObject(GameObject mapObject)
+    public void AddMapObject(GameObject mapObject)
+    {
+        _mapObjects.Add(mapObject);
+    }
+
+
+    /// <summary>
+    /// Try to find a map object at that position.
+    /// </summary>
+    /// <param name="position"></param>
+    /// <param name="gameObject"></param>
+    /// <returns></returns>
+    public bool TryGetMapObject(Point position, out GameObject gameObject)
+    {
+        foreach (var otherGameObject in _mapObjects)
         {
-            _mapObjects.Add(mapObject);
-        }
-
-
-        /// <summary>
-        /// Try to find a map object at that position.
-        /// </summary>
-        /// <param name="position"></param>
-        /// <param name="gameObject"></param>
-        /// <returns></returns>
-        public bool TryGetMapObject(Point position, out GameObject gameObject)
-        {
-            foreach (var otherGameObject in _mapObjects)
+            if (otherGameObject.Position == position)
             {
-                if (otherGameObject.Position == position)
-                {
-                    gameObject = otherGameObject;
-                    return true;
-                }
-            }
-
-            gameObject = null;
-            return false;
-        }
-
-        public void RemoveMapObject(GameObject mapObject)
-        {
-            if (_mapObjects.Contains(mapObject))
-            {
-                _mapObjects.Remove(mapObject);
-                mapObject.RestoreMap(this);
+                gameObject = otherGameObject;
+                return true;
             }
         }
 
-        private void CreateTreasure()
+        gameObject = null;
+        return false;
+    }
+
+    public void RemoveMapObject(GameObject mapObject)
+    {
+        if (_mapObjects.Contains(mapObject))
         {
-            for (int i = 0; i < 1000; i++)
-            {
-                Point randomPosition = new Point(Game.Instance.Random.Next(0, _mapSurface.Surface.Width),
-                    Game.Instance.Random.Next(0, _mapSurface.Surface.Height));
-
-                bool foundObject = _mapObjects.Any(obj => obj.Position == randomPosition);
-                if (foundObject) continue;
-
-
-                GameObject treasure = new Treasure(randomPosition, _mapSurface);
-                _mapObjects.Add(treasure);
-                break;
-            }
+            _mapObjects.Remove(mapObject);
+            mapObject.RestoreMap(this);
         }
+    }
 
-        private void CreateMonster()
+    private void CreateTreasure()
+    {
+        for (int i = 0; i < 1000; i++)
         {
-            for (int i = 0; i < 1000; i++)
-            {
-                Point randomPosition = new Point(Game.Instance.Random.Next(0, _mapSurface.Surface.Width),
-                    Game.Instance.Random.Next(0, _mapSurface.Surface.Height));
+            Point randomPosition = new Point(Game.Instance.Random.Next(0, _mapSurface.Surface.Width),
+                Game.Instance.Random.Next(0, _mapSurface.Surface.Height));
 
-                bool foundObject = _mapObjects.Any(obj => obj.Position == randomPosition);
-                if (foundObject) continue;
+            bool foundObject = _mapObjects.Any(obj => obj.Position == randomPosition);
+            if (foundObject) continue;
 
 
-                GameObject monster = new Monster(randomPosition, _mapSurface);
-                _mapObjects.Add(monster);
-                break;
-            }
+            GameObject treasure = new Treasure(randomPosition, _mapSurface);
+            _mapObjects.Add(treasure);
+            break;
         }
+    }
+
+    private void CreateMonster()
+    {
+        for (int i = 0; i < 1000; i++)
+        {
+            Point randomPosition = new Point(Game.Instance.Random.Next(0, _mapSurface.Surface.Width),
+                Game.Instance.Random.Next(0, _mapSurface.Surface.Height));
+
+            bool foundObject = _mapObjects.Any(obj => obj.Position == randomPosition);
+            if (foundObject) continue;
+
+
+            GameObject monster = new Monster(randomPosition, _mapSurface);
+            _mapObjects.Add(monster);
+            break;
+        }
+    }
 
     private bool monsterMovementSwitch = false;
 
@@ -151,11 +151,11 @@ namespace DungeonCrawl.Maps
     {
         int minDistance = 10; // Define the distance within which monsters start moving towards the player
 
-            foreach (var monster in monsters)
-            {
-                // Calculate the direction to move the monster one step closer to the player
-                int moveX = UserControlledObject.Position.X - monster.Position.X;
-                int moveY = UserControlledObject.Position.Y - monster.Position.Y;
+        foreach (var monster in monsters)
+        {
+            // Calculate the direction to move the monster one step closer to the player
+            int moveX = UserControlledObject.Position.X - monster.Position.X;
+            int moveY = UserControlledObject.Position.Y - monster.Position.Y;
 
             int stepX = moveX != 0 ? moveX / Math.Abs(moveX) : 0;
             int stepY = moveY != 0 ? moveY / Math.Abs(moveY) : 0;
@@ -197,100 +197,96 @@ namespace DungeonCrawl.Maps
         }
     }
 
-        private void CreateWeapon()
+    private void CreateWeapon()
+    {
+        for (int i = 0; i < 1000; i++)
         {
-            for (int i = 0; i < 1000; i++)
-            {
-                // Get a random position
-                Point randomPosition = new Point(Game.Instance.Random.Next(0, _mapSurface.Surface.Width),
-                    Game.Instance.Random.Next(0, _mapSurface.Surface.Height));
+            // Get a random position
+            Point randomPosition = new Point(Game.Instance.Random.Next(0, _mapSurface.Surface.Width),
+                Game.Instance.Random.Next(0, _mapSurface.Surface.Height));
 
-                bool foundObject = _mapObjects.Any(obj => obj.Position == randomPosition);
-                if (foundObject) continue;
+            bool foundObject = _mapObjects.Any(obj => obj.Position == randomPosition);
+            if (foundObject) continue;
 
-                GameObject Weapon = new Weapon(randomPosition, _mapSurface);
-                _mapObjects.Add(Weapon);
-                break;
-            }
+            GameObject Weapon = new Weapon(randomPosition, _mapSurface);
+            _mapObjects.Add(Weapon);
+            break;
         }
+    }
 
-        private void CreateWall(Point Start, Point End)
+    private void CreateWall(Point Start, Point End)
+    {
+        bool isHorizontal = Start.Y == End.Y;
+        bool isVertical = Start.X == End.X;
+
+        if (isHorizontal)
         {
-            bool isHorizontal = Start.Y == End.Y;
-            bool isVertical = Start.X == End.X;
-
-            if (isHorizontal)
+            int minX = Math.Min(Start.X, End.X);
+            int maxX = Math.Max(Start.X, End.X);
+            for (int i = minX; i <= maxX; i++)
             {
-                int minX = Math.Min(Start.X, End.X);
-                int maxX = Math.Max(Start.X, End.X);
-                for (int i = minX; i <= maxX; i++)
+                Point position = new Point(i, Start.Y);
+                if (!_mapObjects.Any(o => o.Position == position))
                 {
-                    Point position = new Point(i, Start.Y);
-                    if (!_mapObjects.Any(o => o.Position == position))
-                    {
-                        GameObject Wall = new Wall(position, _mapSurface);
-                        _mapObjects.Add(Wall);
-                    }
-                }
-            }
-
-            if (isVertical)
-            {
-                int minY = Math.Min(Start.Y, End.Y);
-                int maxY = Math.Max(Start.Y, End.Y);
-                for (int i = minY; i <= maxY; i++)
-                {
-                    Point position = new Point(Start.X, i);
-                    if (!_mapObjects.Any(o => o.Position == position))
-                    {
-                        GameObject Wall = new Wall(position, _mapSurface);
-                        _mapObjects.Add(Wall);
-                    }
+                    GameObject Wall = new Wall(position, _mapSurface);
+                    _mapObjects.Add(Wall);
                 }
             }
         }
 
-        private void CoordinatesOfWalls(List<(Point, Point)> walls)
+        if (isVertical)
         {
-            foreach (var (start, end) in walls)
+            int minY = Math.Min(Start.Y, End.Y);
+            int maxY = Math.Max(Start.Y, End.Y);
+            for (int i = minY; i <= maxY; i++)
             {
-                CreateWall(start, end);
-            }
-
-            singleWall = new Wall(new Point(37, 1), _mapSurface);
-            singleWall1 = new Wall(new Point(40, 1), _mapSurface);
-            _mapObjects.Add(singleWall);
-            _mapObjects.Add(singleWall1);
-
-        }
-
-        private void CreateKey()
-        {
-            for (int i = 0; i < 1000; i++)
-            {
-                Point randomPosition = new Point(Game.Instance.Random.Next(0, _mapSurface.Surface.Width),
-                    Game.Instance.Random.Next(0, _mapSurface.Surface.Height));
-
-                bool foundObject = _mapObjects.Any(obj => obj.Position == randomPosition);
-                if (foundObject) continue;
-
-
-                GameObject Key = new Key(randomPosition, _mapSurface);
-                _mapObjects.Add(Key);
-                break;
+                Point position = new Point(Start.X, i);
+                if (!_mapObjects.Any(o => o.Position == position))
+                {
+                    GameObject Wall = new Wall(position, _mapSurface);
+                    _mapObjects.Add(Wall);
+                }
             }
         }
+    }
 
-        public void CreateDoor()
+    private void CoordinatesOfWalls(List<(Point, Point)> walls)
+    {
+        foreach (var (start, end) in walls)
         {
-            Point doorPosition = new Point((singleWall.Position.X + singleWall1.Position.X) / 2, singleWall.Position.Y);
-            Point doorPosition1 = new Point(doorPosition.X + 1, singleWall.Position.Y);
-            Door door1 = new Door(doorPosition1, _mapSurface);
-            Door door = new Door(doorPosition, _mapSurface);
-            _mapObjects.Add(door);
-            _mapObjects.Add(door1);
+            CreateWall(start, end);
         }
 
-        
+        singleWall = new Wall(new Point(37, 1), _mapSurface);
+        singleWall1 = new Wall(new Point(40, 1), _mapSurface);
+        _mapObjects.Add(singleWall);
+        _mapObjects.Add(singleWall1);
+    }
+
+    private void CreateKey()
+    {
+        for (int i = 0; i < 1000; i++)
+        {
+            Point randomPosition = new Point(Game.Instance.Random.Next(0, _mapSurface.Surface.Width),
+                Game.Instance.Random.Next(0, _mapSurface.Surface.Height));
+
+            bool foundObject = _mapObjects.Any(obj => obj.Position == randomPosition);
+            if (foundObject) continue;
+
+
+            GameObject Key = new Key(randomPosition, _mapSurface);
+            _mapObjects.Add(Key);
+            break;
+        }
+    }
+
+    private void CreateDoor()
+    {
+        Point doorPosition = new Point((singleWall.Position.X + singleWall1.Position.X) / 2, singleWall.Position.Y);
+        Point doorPosition1 = new Point(doorPosition.X + 1, singleWall.Position.Y);
+        Door door1 = new Door(doorPosition1, _mapSurface);
+        Door door = new Door(doorPosition, _mapSurface);
+        _mapObjects.Add(door);
+        _mapObjects.Add(door1);
     }
 }
