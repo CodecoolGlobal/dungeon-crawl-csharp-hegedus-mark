@@ -16,5 +16,10 @@
         <PackageReference Include="SadConsole.Host.MonoGame" Version="10.4.0"/>
         <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.1.303"/>
     </ItemGroup>
+    
+    <ItemGroup>
+      <Compile Remove="Tiles\Walls.cs" />
+      <Compile Remove="Tiles\WallTiles.cs" />
+    </ItemGroup>
 
 </Project>

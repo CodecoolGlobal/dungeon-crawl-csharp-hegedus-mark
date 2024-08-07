@@ -22,6 +22,12 @@ public class RootScreen : ScreenObject
         Children.Add(_map.SurfaceObject);
         _map.DrawElementsOnConsole(5, 5);
     }
+    public override void Update(TimeSpan timeElapsed)
+    {
+        base.Update(timeElapsed);
+
+        _map.MoveProjectiles();
+    }
 
     /// <summary>
     /// Processes keyboard inputs.
@@ -51,6 +57,24 @@ public class RootScreen : ScreenObject
         else if (keyboard.IsKeyPressed(Keys.Right))
         {
             _map.UserControlledObject.Move(_map.UserControlledObject.Position + Direction.Right, _map);
+            handled = true;
+        }
+
+        if (keyboard.IsKeyPressed(Keys.Q))
+        {
+            _map.UserControlledObject.ShootLeft(_map);
+            handled = true;
+        }else if (keyboard.IsKeyPressed(Keys.E))
+        {
+            _map.UserControlledObject.ShootRight(_map);
+            handled = true;
+        }else if (keyboard.IsKeyPressed(Keys.W))
+        {
+            _map.UserControlledObject.ShootUp(_map);
+            handled = true;
+        }else if (keyboard.IsKeyPressed(Keys.S))
+        {
+            _map.UserControlledObject.ShootDown(_map);
             handled = true;
         }
 
