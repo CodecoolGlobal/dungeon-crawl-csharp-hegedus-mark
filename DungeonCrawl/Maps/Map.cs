@@ -55,14 +55,14 @@ public class Map
     {
         List<Projectile> Shoots = _mapObjects.OfType<Projectile>().ToList();
 
-        foreach (Projectile shoot in Shoots)
+        /*foreach (Projectile shoot in Shoots)
         {
             bool hit = shoot.Move(this);
             if (hit)
             {
                 RemoveMapObject(shoot);
             }
-        }
+        }*/
     }
 
     public void AddMapObject(GameObject mapObject)

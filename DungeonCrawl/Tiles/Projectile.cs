@@ -11,7 +11,9 @@ public class Projectile : GameObject
     {
         _direction = direction;
     }
-    public bool Move(Map map)
+    
+    
+    /*public  bool Move(Map map)
     {
         Point newPosition = Position + _direction;
        
@@ -40,8 +42,7 @@ public class Projectile : GameObject
         DrawGameObject(map.SurfaceObject);
         
         return false;
-    }
-
+    }*/
     
     
 }

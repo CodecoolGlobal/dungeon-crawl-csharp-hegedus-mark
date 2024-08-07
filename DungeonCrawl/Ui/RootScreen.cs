@@ -39,10 +39,11 @@ public class RootScreen : ScreenObject
         Children.Add(inventorySurface);
         _map.DrawElementsOnConsole(5, 5);
     }
+
     public override void Update(TimeSpan timeElapsed)
     {
         base.Update(timeElapsed);
-        
+
         counter++;
         System.Console.WriteLine($"Counter: {counter}");
         _map.MoveProjectiles();
@@ -79,23 +80,26 @@ public class RootScreen : ScreenObject
             _map.UserControlledObject.Move(_map.UserControlledObject.Position + Direction.Right, _map);
             handled = true;
         }
-        
+
 
         if (keyboard.IsKeyPressed(Keys.A))
         {
-            _map.UserControlledObject.ShootLeft(_map);
+            _map.UserControlledObject.Shoot(Direction.Left, _map);
             handled = true;
-        }else if (keyboard.IsKeyPressed(Keys.D))
+        }
+        else if (keyboard.IsKeyPressed(Keys.D))
         {
-            _map.UserControlledObject.ShootRight(_map);
+            _map.UserControlledObject.Shoot(Direction.Right, _map);
             handled = true;
-        }else if (keyboard.IsKeyPressed(Keys.W))
+        }
+        else if (keyboard.IsKeyPressed(Keys.W))
         {
-            _map.UserControlledObject.ShootUp(_map);
+            _map.UserControlledObject.Shoot(Direction.Up, _map);
             handled = true;
-        }else if (keyboard.IsKeyPressed(Keys.S))
+        }
+        else if (keyboard.IsKeyPressed(Keys.S))
         {
-            _map.UserControlledObject.ShootDown(_map);
+            _map.UserControlledObject.Shoot(Direction.Down, _map);
             handled = true;
         }
 
@@ -103,7 +107,7 @@ public class RootScreen : ScreenObject
         {
             _map.IsPlayerCloseToMonster();
         }
+
         return handled;
     }
-    
 }
