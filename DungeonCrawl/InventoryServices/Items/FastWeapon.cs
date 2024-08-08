@@ -25,7 +25,7 @@ public class FastWeapon : Item
         if (!map.TryGetMapObject(initialProjectilePosition, out _))
         {
             // Create and add the projectile to the map
-            FastProjectile projectile = new FastProjectile(initialProjectilePosition, direction, map.SurfaceObject);
+            FastProjectile projectile = new FastProjectile(initialProjectilePosition, direction, map.SurfaceObject, Color.Orange);
             map.AddMapObject(projectile);
         }
 

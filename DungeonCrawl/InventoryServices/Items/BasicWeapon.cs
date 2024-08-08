@@ -24,7 +24,7 @@ public class BasicWeapon : Item
         if (!map.TryGetMapObject(initialProjectilePosition, out _))
         {
             // Create and add the projectile to the map
-            Projectile projectile = new Projectile(initialProjectilePosition, direction, map.SurfaceObject);
+            Projectile projectile = new Projectile(initialProjectilePosition, direction, map.SurfaceObject, Color.Silver);
             map.AddMapObject(projectile);
         }
 

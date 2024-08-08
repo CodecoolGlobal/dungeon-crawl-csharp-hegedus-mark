@@ -75,7 +75,7 @@ namespace DungeonCrawl.InventoryServices.Items
                 if (!map.TryGetMapObject(pos, out _))
                 {
                     // Create and add the projectile to the map
-                    Projectile projectile = new Projectile(pos, projectileDirection, map.SurfaceObject);
+                    Projectile projectile = new Projectile(pos, projectileDirection, map.SurfaceObject, Color.Cyan);
                     map.AddMapObject(projectile);
                 }
             }

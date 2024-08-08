@@ -34,7 +34,8 @@ public class UltimateWeapon : Item
             if (!map.TryGetMapObject(initialProjectilePosition, out _))
             {
                 // Create and add the projectile to the map
-                FastProjectile projectile = new FastProjectile(initialProjectilePosition, dir, map.SurfaceObject);
+                FastProjectile projectile =
+                    new FastProjectile(initialProjectilePosition, dir, map.SurfaceObject, Color.Gold, 1000);
                 map.AddMapObject(projectile);
             }
         }

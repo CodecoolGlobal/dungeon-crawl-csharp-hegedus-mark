@@ -8,14 +8,15 @@ public class Projectile : GameObject, IMovable
     public Direction Direction;
     private double _accumulatedCell = 0.0;
     public virtual double Speed => 20;
+
     public int Attack;
 
 
-    public Projectile(Point position, Direction direction, IScreenSurface hostingSurface)
-        : base(new ColoredGlyph(Color.Blue, Color.Transparent, '+'), position, hostingSurface)
+    public Projectile(Point position, Direction direction, IScreenSurface hostingSurface, Color color, int attack = 10)
+        : base(new ColoredGlyph(color, Color.Transparent, '+'), position, hostingSurface)
     {
         Direction = direction;
-        Attack = 10;
+        Attack = attack;
     }
 
     public override bool Move(Point newPosition, Map map)
@@ -46,7 +47,7 @@ public class Projectile : GameObject, IMovable
         DisplayMoveOnScreen(newPosition, map);
         return true;
     }
-    
+
     public void Update(TimeSpan timeElapsed, Map map)
     {
         if (_accumulatedCell > 1)

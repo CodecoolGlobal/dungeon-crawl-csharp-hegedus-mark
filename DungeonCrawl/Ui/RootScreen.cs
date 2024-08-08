@@ -175,6 +175,11 @@ public class RootScreen : ScreenObject
             ChangeToMap3(new Point(40, 19));
         }
 
+        if (keyboard.IsKeyPressed(Keys.End))
+        {
+            _inventory.AddItem(new UltimateWeapon());
+        }
+
         return handled;
     }
 

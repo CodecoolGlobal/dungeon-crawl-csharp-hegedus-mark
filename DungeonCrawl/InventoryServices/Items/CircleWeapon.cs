@@ -8,7 +8,7 @@ public class CircleWeapon : Item
     private const int COOLDOWN = 60;
 
     private static readonly ColoredGlyph Appearance =
-        new ColoredGlyph(Color.Blue, Color.Transparent, 233);
+        new ColoredGlyph(Color.LightBlue, Color.Transparent, 233);
 
     private readonly Direction[] _directions = new[]
     {
@@ -34,7 +34,7 @@ public class CircleWeapon : Item
             if (!map.TryGetMapObject(initialProjectilePosition, out _))
             {
                 // Create and add the projectile to the map
-                Projectile projectile = new Projectile(initialProjectilePosition, dir, map.SurfaceObject);
+                Projectile projectile = new Projectile(initialProjectilePosition, dir, map.SurfaceObject, Color.LightBlue);
                 map.AddMapObject(projectile);
             }
         }

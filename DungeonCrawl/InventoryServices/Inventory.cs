@@ -38,7 +38,7 @@ public class Inventory
     public Inventory(int width, int height)
     {
         _inventorySurface = new ScreenSurface(width, height);
-        _items = new List<IItem>(5);
+        _items = new List<IItem>(InventorySlotAmount);
         _itemSlots = new List<InventorySlot>(InventorySlotAmount);
         DrawItemSlots(InventorySlotAmount);
         DrawCounterUi();
@@ -63,6 +63,11 @@ public class Inventory
 
     public void AddItem(IItem item)
     {
+        if (_items.Count == _items.Capacity)
+        {
+            return;
+        }
+
         if (_items.Contains(item))
         {
             return;
