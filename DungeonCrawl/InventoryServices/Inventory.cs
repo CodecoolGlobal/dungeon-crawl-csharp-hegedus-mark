@@ -4,15 +4,33 @@ namespace DungeonCrawl.InventoryServices;
 
 public class Inventory
 {
-    public const int InventorySlotWidth = 9;
+    public const int InventorySlotWidth = 10;
     public const int InventorySlotHeight = 5;
     public const int InventorySlotGap = 5;
     public const int InventorySlotAmount = 5;
+    public const int CounterUiWidth = 10;
+    public const int CounterUiHeight = 5;
+    public static readonly Point CounterUiPosition = new Point(65, 0);
+
+
     private List<IItem> _items;
     private List<InventorySlot> _itemSlots;
-    public int TreasuresCollected;
+
+    private int _treasuresCollected;
+
+    public int TreasuresCollected
+    {
+        get => _treasuresCollected;
+        set
+        {
+            _treasuresCollected = value;
+            _counterUi.TreasuresCollected = value;
+        }
+    }
+
     public ScreenSurface SurfaceObject => _inventorySurface;
     private ScreenSurface _inventorySurface;
+    private CounterUi _counterUi;
 
     public Inventory(int width, int height)
     {
@@ -20,6 +38,7 @@ public class Inventory
         _items = new List<IItem>();
         _itemSlots = new List<InventorySlot>(InventorySlotAmount);
         DrawItemSlots(InventorySlotAmount);
+        DrawCounterUi();
     }
 
     private void DrawItemSlots(int slots)
@@ -31,6 +50,12 @@ public class Inventory
             _inventorySurface.Children.Add(slot.SurfaceObject);
             _itemSlots.Add(slot);
         }
+    }
+
+    private void DrawCounterUi()
+    {
+        _counterUi = new CounterUi(CounterUiWidth, CounterUiHeight, CounterUiPosition);
+        _inventorySurface.Children.Add(_counterUi.Surface);
     }
 
     public void AddItem(IItem item)

@@ -97,7 +97,7 @@ public class RootScreen : ScreenObject
         }
         else if (_currentMap.Walls == map2Walls)
         {
-            if (playerPos.X == 0)
+            if (playerPos.X == 79)
             {
                 ChangeToSecretMap(new Point(78, 10));
             }
