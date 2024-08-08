@@ -11,7 +11,7 @@ public abstract class GameObject
 {
     public Point Position { get; set; }
     public void RestoreMap(Map map) => _mapAppearance.CopyAppearanceTo(map.SurfaceObject.Surface[Position]);
-    private ColoredGlyph Appearance { get; set; }
+    protected ColoredGlyph Appearance { get; set; }
     private ColoredGlyph _mapAppearance = new ColoredGlyph();
 
     /// <summary>
