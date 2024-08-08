@@ -65,7 +65,7 @@ public class RootScreen : ScreenObject
     public override void Update(TimeSpan timeElapsed)
     {
         base.Update(timeElapsed);
-
+        if (menuSwitch) return;
         counter++;
         System.Console.WriteLine($"Counter: {counter}");
         var movables = _currentMap.Movables;
