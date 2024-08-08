@@ -49,7 +49,7 @@ public class Inventory
         for (int i = 0; i < slots; i++)
         {
             var slot = new InventorySlot(InventorySlotWidth, InventorySlotHeight,
-                new Point(i * InventorySlotWidth, 0));
+                new Point(i * InventorySlotWidth, 0), i + 1);
             _inventorySurface.Children.Add(slot.SurfaceObject);
             _itemSlots.Add(slot);
         }

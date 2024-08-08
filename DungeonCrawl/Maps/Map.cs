@@ -47,7 +47,7 @@ public class Map
         _mapObjects.Add(player);
     }
 
-    public void DrawElementsOnConsole(int treasure, int monster, IItem item, bool bossLevel = false)
+    public void DrawElementsOnConsole(int treasure, int monster, IItem item = null, bool bossLevel = false)
     {
         for (int i = 0; i < treasure; i++)
         {
@@ -59,7 +59,11 @@ public class Map
             CreateMonster();
         }
 
-        CreateWeapon(item);
+        if (item is not null)
+        {
+            CreateWeapon(item);
+        }
+
         CreateKey();
         CreateDoor();
         CreateSecretDoor();

@@ -37,7 +37,7 @@ public class RootScreen : ScreenObject
         _player = new Player(_currentMap.SurfaceObject.Surface.Area.Center, _currentMap.SurfaceObject, _inventory);
         _player.CurrentlySelectedItem = _inventory.SelectItem(0);
         _currentMap.SpawnPlayer(_player);
-        
+
         _currentMap.DrawElementsOnConsole(5, 5, RandomlyGeneratedItemToSpawn());
         Children.Add(_currentMap.SurfaceObject);
         LoadInventory();
@@ -90,7 +90,7 @@ public class RootScreen : ScreenObject
     {
         Children.Remove(_currentMap.SurfaceObject);
         _currentMap = new Map(Game.Instance.ScreenCellsX, Game.Instance.ScreenCellsY - 5, _mapSecret, this);
-        _currentMap.DrawElementsOnConsole(0, 0, RandomlyGeneratedItemToSpawn());
+        _currentMap.DrawElementsOnConsole(0, 0, new UltimateWeapon());
         _currentMap.UserControlledObject.Position = newPlayerPosition;
         Children.Add(_currentMap.SurfaceObject);
     }
@@ -356,8 +356,15 @@ public class RootScreen : ScreenObject
 
     private IItem RandomlyGeneratedItemToSpawn()
     {
+        if (_spawnableItems.Count == 0)
+        {
+            return new BasicWeapon();
+        }
+
         var randomIndex = Game.Instance.Random.Next(_spawnableItems.Count);
-        return _spawnableItems[randomIndex];
+        var selectedItem = _spawnableItems[randomIndex];
+        _spawnableItems.Remove(selectedItem);
+        return selectedItem;
     }
 
 
@@ -433,5 +440,7 @@ public class RootScreen : ScreenObject
     private List<IItem> _spawnableItems = new List<IItem>
     {
         new CircleWeapon(),
+        new FastWeapon(),
+        new WaveWeapon()
     };
 }
