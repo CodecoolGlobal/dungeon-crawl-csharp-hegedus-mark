@@ -44,20 +44,55 @@ public class RootScreen : ScreenObject
         Children.Add(inventorySurface);
     }
 
-    public void ChangeToMap2()
+    public void ChangeToMap2(Point newPlayerPosition)
     {
         Children.Remove(_currentMap.SurfaceObject);
-        _currentMap = new Map(Game.Instance.ScreenCellsX, Game.Instance.ScreenCellsY - 5, map1Walls, this);
+        _currentMap = new Map(Game.Instance.ScreenCellsX, Game.Instance.ScreenCellsY - 5, map2Walls, this);
         _currentMap.DrawElementsOnConsole(1, 20);
+        _currentMap.UserControlledObject.Position = newPlayerPosition;
         Children.Add(_currentMap.SurfaceObject);
     }
 
-    public void ChangeToMap3()
+    public void ChangeToMap3(Point newPlayerPosition)
     {
         Children.Remove(_currentMap.SurfaceObject);
-        _currentMap = new Map(Game.Instance.ScreenCellsX, Game.Instance.ScreenCellsY - 5, map1Walls, this);
-        _currentMap.DrawElementsOnConsole(1, 20);
+        _currentMap = new Map(Game.Instance.ScreenCellsX, Game.Instance.ScreenCellsY - 5, map3Walls, this);
+        _currentMap.DrawElementsOnConsole(0, 0, true);
+        _currentMap.UserControlledObject.Position = newPlayerPosition;
         Children.Add(_currentMap.SurfaceObject);
+    }
+
+    public void CheckPlayerPosition()
+    {
+        var playerPos = _currentMap.UserControlledObject.Position;
+        var currentMapWidth = _currentMap.SurfaceObject.Surface.Width;
+        var currentMapHeight = _currentMap.SurfaceObject.Surface.Height;
+
+        if (_currentMap.Walls == map1Walls)
+        {
+            if (playerPos.X == 0)
+            {
+                ChangeToMap2(new Point(currentMapWidth - 2, playerPos.Y));
+            }
+            
+            else if (playerPos.Y == 0)
+            {
+                ChangeToMap2(new Point(playerPos.X, currentMapHeight - 2));
+            }
+
+        }else if (_currentMap.Walls == map2Walls)
+        {
+            if (playerPos.X == 0)
+            {
+                ChangeToMap3(new Point(currentMapWidth - 2, playerPos.Y));
+            }
+            
+            else if (playerPos.Y == 0)
+            {
+                ChangeToMap3(new Point(playerPos.X, currentMapHeight - 2));
+            }
+        }
+        
     }
 
     public override void Update(TimeSpan timeElapsed)
@@ -67,44 +102,42 @@ public class RootScreen : ScreenObject
         counter++;
         System.Console.WriteLine($"Counter: {counter}");
         _currentMap.MoveProjectiles();
+        CheckPlayerPosition();
     }
 
-
-    /// <summary>
-    /// Processes keyboard inputs.
-    /// </summary>
-    /// <param name="keyboard"></param>
-    /// <returns></returns>
     public override bool ProcessKeyboard(Keyboard keyboard)
     {
         bool handled = false;
+        
+        Point newPosition = _currentMap.UserControlledObject.Position;
 
         if (keyboard.IsKeyPressed(Keys.Up))
         {
-            _currentMap.UserControlledObject.Move(_currentMap.UserControlledObject.Position + Direction.Up,
-                _currentMap);
+            newPosition += Direction.Up;
             handled = true;
         }
         else if (keyboard.IsKeyPressed(Keys.Down))
         {
-            _currentMap.UserControlledObject.Move(_currentMap.UserControlledObject.Position + Direction.Down,
-                _currentMap);
+            newPosition += Direction.Down;
             handled = true;
         }
-
-        if (keyboard.IsKeyPressed(Keys.Left))
+        else if (keyboard.IsKeyPressed(Keys.Left))
         {
-            _currentMap.UserControlledObject.Move(_currentMap.UserControlledObject.Position + Direction.Left,
-                _currentMap);
+            newPosition += Direction.Left;
             handled = true;
         }
         else if (keyboard.IsKeyPressed(Keys.Right))
         {
-            _currentMap.UserControlledObject.Move(_currentMap.UserControlledObject.Position + Direction.Right,
-                _currentMap);
+            newPosition += Direction.Right;
             handled = true;
         }
 
+        // Mozgást figyeli
+        if (handled)
+        {
+            _currentMap.UserControlledObject.Move(newPosition, _currentMap);
+            CheckPlayerPosition();
+        }
 
         if (keyboard.IsKeyPressed(Keys.A))
         {
@@ -126,25 +159,14 @@ public class RootScreen : ScreenObject
             _currentMap.UserControlledObject.Shoot(Direction.Down, _currentMap);
             handled = true;
         }
-        //For testing purposes
-        if (keyboard.IsKeyPressed(Keys.NumPad1))
-        {
-            ChangeToMap2();
-        }
-
-        if (false)
-        {
-            _currentMap.IsPlayerCloseToMonster();
-        }
 
         return handled;
     }
 
-
     private List<(Point, Point)> map1Walls = new List<(Point, Point)>
     {
         (new Point(0, 0), new Point(37, 0)),
-        (new Point(40,0),new Point(79,0)),
+        (new Point(40, 0), new Point(79, 0)),
         (new Point(0, 1), new Point(0, 19)),
         (new Point(0, 19), new Point(79, 19)),
         (new Point(79, 0), new Point(79, 19)),
@@ -164,15 +186,49 @@ public class RootScreen : ScreenObject
         (new Point(30, 15), new Point(40, 15)),
         (new Point(50, 18), new Point(60, 18)),
     };
-    
+
+    private List<(Point, Point)> map3Walls = new List<(Point, Point)>
+    {
+        (new Point(0, 0), new Point(79, 0)),
+        (new Point(0, 1), new Point(0, 19)),
+        (new Point(0, 19), new Point(37, 19)),
+        (new Point(40, 19), new Point(79, 19)),
+        (new Point(79, 0), new Point(79, 19)),
+    };
+
+    private List<(Point, Point)> map2Walls = new List<(Point, Point)>
+    {
+        (new Point(0, 0), new Point(37, 0)),
+        (new Point(40, 0), new Point(79, 0)),
+        (new Point(0, 1), new Point(0, 19)),
+        (new Point(0, 19), new Point(37, 19)),
+        (new Point(40, 19), new Point(79, 19)),
+        (new Point(79, 0), new Point(79, 19)),
+        
+
+        (new Point(10, 2), new Point(10, 17)),
+        (new Point(20, 2), new Point(20, 17)),
+        (new Point(30, 5), new Point(30, 14)),
+        (new Point(40, 2), new Point(40, 17)),
+        (new Point(50, 5), new Point(50, 14)),
+        (new Point(60, 2), new Point(60, 17)),
+        (new Point(70, 2), new Point(70, 17)),
+
+        (new Point(15, 5), new Point(25, 5)),
+        (new Point(35, 7), new Point(45, 7)),
+        (new Point(55, 10), new Point(65, 10)),
+        (new Point(15, 12), new Point(25, 12)),
+        (new Point(35, 15), new Point(45, 15)),
+    };
+
     public void GameOver()
     {
         // Create a new console to display the message
         var gameOverConsole = new Console(Game.Instance.ScreenCellsX, Game.Instance.ScreenCellsY);
-        gameOverConsole.Print(Game.Instance.ScreenCellsX / 2 - 4, Game.Instance.ScreenCellsY / 2, "Game Over", Color.White);
-        
+        gameOverConsole.Print(Game.Instance.ScreenCellsX / 2 - 4, Game.Instance.ScreenCellsY / 2, "Game Over",
+            Color.White);
+
         // Replace the current screen with the game over console
         Game.Instance.Screen = gameOverConsole;
     }
-    
 }

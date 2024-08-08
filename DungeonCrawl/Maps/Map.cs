@@ -20,6 +20,7 @@ public class Map
     private Wall singleWall;
     private Wall singleWall1;
     private RootScreen _rootScreen;
+    public List<(Point, Point)> Walls { get; private set; }
 
     /// <summary>
     /// Constructor.
@@ -35,9 +36,10 @@ public class Map
 
         UserControlledObject = new Player(_mapSurface.Surface.Area.Center, _mapSurface);
         CoordinatesOfWalls(walls);
+        Walls = walls;
     }
 
-    public void DrawElementsOnConsole(int treasure, int monster)
+    public void DrawElementsOnConsole(int treasure, int monster, bool bossLevel = false)
     {
         for (int i = 0; i < treasure; i++)
         {
@@ -52,6 +54,18 @@ public class Map
         CreateWeapon();
         CreateKey();
         CreateDoor();
+
+        if (bossLevel)
+        {
+            CreateBoss();
+        }
+    }
+
+    public void CreateBoss()
+    {
+        Point BossPosition = new Point(_mapSurface.Surface.Width/2, _mapSurface.Surface.Height/2);
+        GameObject boss = new Boss(BossPosition, _mapSurface);
+        _mapObjects.Add(boss);
     }
 
     public void MoveProjectiles()
