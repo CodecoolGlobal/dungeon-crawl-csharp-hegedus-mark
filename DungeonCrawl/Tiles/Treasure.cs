@@ -28,7 +28,7 @@ public class Treasure : GameObject
         // Is the player the one that touched us?
         if (source is Player player)
         {
-            player.CollectTreasure();
+            player.CollectTreasure(map);
             map.RemoveMapObject(this);
             return true;
         }

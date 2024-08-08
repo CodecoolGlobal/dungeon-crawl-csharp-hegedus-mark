@@ -90,8 +90,8 @@ public class RootScreen : ScreenObject
     {
         Children.Remove(_currentMap.SurfaceObject);
         _currentMap = new Map(Game.Instance.ScreenCellsX, Game.Instance.ScreenCellsY - 5, _mapSecret, this);
+        SpawnPlayerOnMap(_currentMap, newPlayerPosition);
         _currentMap.DrawElementsOnConsole(0, 0, new UltimateWeapon());
-        _currentMap.UserControlledObject.Position = newPlayerPosition;
         Children.Add(_currentMap.SurfaceObject);
     }
 
@@ -100,7 +100,7 @@ public class RootScreen : ScreenObject
         Children.Remove(_currentMap.SurfaceObject);
         _currentMap = new Map(Game.Instance.ScreenCellsX, Game.Instance.ScreenCellsY - 5, _map3Walls, this);
         SpawnPlayerOnMap(_currentMap, newPlayerPosition);
-        _currentMap.DrawElementsOnConsole(0, 0, RandomlyGeneratedItemToSpawn(), true);
+        _currentMap.DrawElementsOnConsole(0, 0, null, true);
         Children.Add(_currentMap.SurfaceObject);
     }
 
@@ -127,7 +127,7 @@ public class RootScreen : ScreenObject
         }
         else if (_currentMap.Walls == _map2Walls)
         {
-            if (playerPos.X == 79)
+            if (playerPos.X == 0)
             {
                 ChangeToSecretMap(new Point(78, 10));
             }
@@ -135,6 +135,13 @@ public class RootScreen : ScreenObject
             else if (playerPos.Y == 0)
             {
                 ChangeToMap3(new Point(playerPos.X, currentMapHeight - 2));
+            }
+        }
+        else if (_currentMap.Walls == _mapSecret)
+        {
+            if (playerPos.X == 79)
+            {
+                ChangeToMap2(new Point(1, 10));
             }
         }
     }
@@ -406,7 +413,8 @@ public class RootScreen : ScreenObject
     {
         (new Point(0, 0), new Point(37, 0)),
         (new Point(40, 0), new Point(79, 0)),
-        (new Point(0, 1), new Point(0, 19)),
+        (new Point(0, 1), new Point(0, 9)),
+        (new Point(0, 11), new Point(0, 19)),
         (new Point(0, 19), new Point(37, 19)),
         (new Point(40, 19), new Point(79, 19)),
         (new Point(79, 0), new Point(79, 19)),

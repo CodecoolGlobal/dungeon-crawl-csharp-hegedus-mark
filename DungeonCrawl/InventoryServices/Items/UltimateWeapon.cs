@@ -8,7 +8,7 @@ public class UltimateWeapon : Item
     private const int COOLDOWN = 10;
 
     private static readonly ColoredGlyph Appearance =
-        new ColoredGlyph(Color.Blue, Color.Transparent, 234);
+        new ColoredGlyph(Color.Gold, Color.Transparent, 234);
 
     private readonly Direction[] _directions = new[]
     {
