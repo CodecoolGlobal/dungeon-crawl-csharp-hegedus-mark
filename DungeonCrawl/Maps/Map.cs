@@ -117,8 +117,13 @@ public class Map
     {
         for (int i = 0; i < 1000; i++)
         {
-            Point randomPosition = new Point(Game.Instance.Random.Next(0, _mapSurface.Surface.Width),
-                Game.Instance.Random.Next(0, _mapSurface.Surface.Height));
+            Point randomPosition;
+            do
+            {
+                randomPosition = new Point(Game.Instance.Random.Next(0, _mapSurface.Surface.Width),
+                    Game.Instance.Random.Next(0, _mapSurface.Surface.Height));
+            } while (Math.Abs(UserControlledObject.Position.X - randomPosition.X) <= 11 && Math.Abs(UserControlledObject.Position.Y - randomPosition.Y) <= 11);
+
 
             bool foundObject = _mapObjects.Any(obj => obj.Position == randomPosition);
             if (foundObject) continue;

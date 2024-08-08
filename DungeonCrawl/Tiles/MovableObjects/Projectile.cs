@@ -8,12 +8,14 @@ public class Projectile : GameObject, IMovable
     public Direction Direction;
     private double _accumulatedCell = 0.0;
     public double Speed => 20;
+    public int Attack;
 
 
     public Projectile(Point position, Direction direction, IScreenSurface hostingSurface)
         : base(new ColoredGlyph(Color.Blue, Color.Transparent, '+'), position, hostingSurface)
     {
         Direction = direction;
+        Attack = 10;
     }
 
     public override bool Move(Point newPosition, Map map)

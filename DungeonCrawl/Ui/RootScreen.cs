@@ -67,7 +67,7 @@ public class RootScreen : ScreenObject
         base.Update(timeElapsed);
 
         counter++;
-        System.Console.WriteLine($"Counter: {counter}");
+        /*System.Console.WriteLine($"Counter: {counter}");*/
         var movables = _currentMap.Movables;
 
         foreach (var movableObject in movables)
