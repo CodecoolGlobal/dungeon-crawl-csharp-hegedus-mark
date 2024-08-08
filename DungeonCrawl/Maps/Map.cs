@@ -1,7 +1,9 @@
 ﻿using System;
 using DungeonCrawl.Tiles;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
+using DungeonCrawl.Tiles.MovableObjects;
 using DungeonCrawl.Ui;
 
 namespace DungeonCrawl.Maps;
@@ -15,6 +17,7 @@ public class Map
     public ScreenSurface SurfaceObject => _mapSurface;
     public Player UserControlledObject { get; private set; }
     private List<GameObject> _mapObjects;
+    public IEnumerable<IMovable> Movables => _mapObjects.OfType<IMovable>().ToList();
     private List<GameObject> monsters => _mapObjects.Where(item => item is Monster).ToList();
     private ScreenSurface _mapSurface;
     private Wall singleWall;
@@ -34,6 +37,7 @@ public class Map
         _mapSurface.UseMouse = false;
 
         UserControlledObject = new Player(_mapSurface.Surface.Area.Center, _mapSurface);
+        _mapObjects.Add(UserControlledObject);
         CoordinatesOfWalls(walls);
     }
 
@@ -53,27 +57,7 @@ public class Map
         CreateKey();
         CreateDoor();
     }
-
-    public void MoveProjectiles()
-    {
-        List<Projectile> projectiles = _mapObjects.OfType<Projectile>().ToList();
-
-        foreach (Projectile projectile in projectiles)
-        {
-            var newPosition = projectile.Position + projectile.Direction;
-
-
-            if (TryGetMapObject(newPosition, out GameObject found))
-            {
-                projectile.HitSomething(found, this);
-            }
-            else
-            {
-                projectile.Move(newPosition, this);
-            }
-        }
-    }
-
+    
 
     public void AddMapObject(GameObject mapObject)
     {
@@ -108,6 +92,7 @@ public class Map
         {
             _mapObjects.Remove(mapObject);
             mapObject.RestoreMap(this);
+            _mapSurface.IsDirty = true;
         }
     }
 
@@ -139,7 +124,7 @@ public class Map
             if (foundObject) continue;
 
 
-            GameObject monster = new Monster(randomPosition, _mapSurface);
+            GameObject monster = new Monster(randomPosition, _mapSurface, UserControlledObject);
             _mapObjects.Add(monster);
             break;
         }
@@ -147,55 +132,6 @@ public class Map
 
     private bool monsterMovementSwitch = false;
 
-    public void IsPlayerCloseToMonster()
-    {
-        int minDistance = 10; // Define the distance within which monsters start moving towards the player
-
-        foreach (var monster in monsters)
-        {
-            // Calculate the direction to move the monster one step closer to the player
-            int moveX = UserControlledObject.Position.X - monster.Position.X;
-            int moveY = UserControlledObject.Position.Y - monster.Position.Y;
-
-            int stepX = moveX != 0 ? moveX / Math.Abs(moveX) : 0;
-            int stepY = moveY != 0 ? moveY / Math.Abs(moveY) : 0;
-
-            if (monsterMovementSwitch && Math.Abs(stepX) == 1 && stepY == 0)
-            {
-                stepY = 1;
-            }
-            else if (!monsterMovementSwitch && Math.Abs(stepX) == 1 && stepY == 0)
-            {
-                stepY = -1;
-            }
-
-            if (monsterMovementSwitch && Math.Abs(stepY) == 1 && stepX == 0)
-            {
-                stepX = 1;
-            }
-            else if (!monsterMovementSwitch && Math.Abs(stepY) == 1 && stepX == 0)
-            {
-                stepX = -1;
-            }
-
-            monsterMovementSwitch = !monsterMovementSwitch;
-
-            Point newPosition = new Point(monster.Position.X + stepX, monster.Position.Y + stepY);
-
-
-            if (Math.Abs(moveX) <= minDistance && Math.Abs(moveY) <= minDistance)
-            {
-                if (monster.Move(newPosition, this))
-                {
-                    // Check if the monster has moved to the player's position
-                    if (newPosition == UserControlledObject.Position)
-                    {
-                        UserControlledObject.Touched(monster, this);
-                    }
-                }
-            }
-        }
-    }
 
     private void CreateWeapon()
     {

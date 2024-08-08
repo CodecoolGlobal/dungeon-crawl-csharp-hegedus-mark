@@ -23,7 +23,7 @@ public class RootScreen : ScreenObject
         var testItem = new Item
         {
             ForegroundColor = Color.Beige,
-            GlyphIndex = 6,
+            GlyphIndex = 1,
             Name = "Test"
         };
 
@@ -66,7 +66,12 @@ public class RootScreen : ScreenObject
 
         counter++;
         System.Console.WriteLine($"Counter: {counter}");
-        _currentMap.MoveProjectiles();
+        var movables = _currentMap.Movables;
+
+        foreach (var movableObject in movables)
+        {
+            movableObject.Update(timeElapsed, _currentMap);
+        }
     }
 
 
@@ -77,34 +82,86 @@ public class RootScreen : ScreenObject
     /// <returns></returns>
     public override bool ProcessKeyboard(Keyboard keyboard)
     {
+        bool handled = HandlePlayerInteraction(keyboard);
+
+        // For testing purposes
+        if (keyboard.IsKeyPressed(Keys.NumPad1))
+        {
+            ChangeToMap2();
+        }
+
+        return handled;
+    }
+
+    private bool HandlePlayerInteraction(Keyboard keyboard)
+    {
+        bool movementHandled = HandlePlayerMovement(keyboard);
+        bool shootingHandled = HandlePlayerShoot(keyboard);
+
+        return movementHandled || shootingHandled;
+    }
+
+    private bool HandlePlayerMovement(Keyboard keyboard)
+    {
         bool handled = false;
+        _currentMap.UserControlledObject.Stopped = false;
 
-        if (keyboard.IsKeyPressed(Keys.Up))
+        bool up = keyboard.IsKeyDown(Keys.Up);
+        bool down = keyboard.IsKeyDown(Keys.Down);
+        bool left = keyboard.IsKeyDown(Keys.Left);
+        bool right = keyboard.IsKeyDown(Keys.Right);
+
+        if (up && left)
         {
-            _currentMap.UserControlledObject.Move(_currentMap.UserControlledObject.Position + Direction.Up,
-                _currentMap);
+            _currentMap.UserControlledObject.Direction = Direction.UpLeft;
             handled = true;
         }
-        else if (keyboard.IsKeyPressed(Keys.Down))
+        else if (up && right)
         {
-            _currentMap.UserControlledObject.Move(_currentMap.UserControlledObject.Position + Direction.Down,
-                _currentMap);
+            _currentMap.UserControlledObject.Direction = Direction.UpRight;
             handled = true;
+        }
+        else if (down && left)
+        {
+            _currentMap.UserControlledObject.Direction = Direction.DownLeft;
+            handled = true;
+        }
+        else if (down && right)
+        {
+            _currentMap.UserControlledObject.Direction = Direction.DownRight;
+            handled = true;
+        }
+        else if (up)
+        {
+            _currentMap.UserControlledObject.Direction = Direction.Up;
+            handled = true;
+        }
+        else if (down)
+        {
+            _currentMap.UserControlledObject.Direction = Direction.Down;
+            handled = true;
+        }
+        else if (left)
+        {
+            _currentMap.UserControlledObject.Direction = Direction.Left;
+            handled = true;
+        }
+        else if (right)
+        {
+            _currentMap.UserControlledObject.Direction = Direction.Right;
+            handled = true;
+        }
+        else
+        {
+            _currentMap.UserControlledObject.Stopped = true;
         }
 
-        if (keyboard.IsKeyPressed(Keys.Left))
-        {
-            _currentMap.UserControlledObject.Move(_currentMap.UserControlledObject.Position + Direction.Left,
-                _currentMap);
-            handled = true;
-        }
-        else if (keyboard.IsKeyPressed(Keys.Right))
-        {
-            _currentMap.UserControlledObject.Move(_currentMap.UserControlledObject.Position + Direction.Right,
-                _currentMap);
-            handled = true;
-        }
+        return handled;
+    }
 
+    private bool HandlePlayerShoot(Keyboard keyboard)
+    {
+        bool handled = false;
 
         if (keyboard.IsKeyPressed(Keys.A))
         {
@@ -126,25 +183,25 @@ public class RootScreen : ScreenObject
             _currentMap.UserControlledObject.Shoot(Direction.Down, _currentMap);
             handled = true;
         }
-        //For testing purposes
-        if (keyboard.IsKeyPressed(Keys.NumPad1))
-        {
-            ChangeToMap2();
-        }
-
-        if (false)
-        {
-            _currentMap.IsPlayerCloseToMonster();
-        }
 
         return handled;
     }
 
+    public void GameOver()
+    {
+        // Create a new console to display the message
+        var gameOverConsole = new Console(Game.Instance.ScreenCellsX, Game.Instance.ScreenCellsY);
+        gameOverConsole.Print(Game.Instance.ScreenCellsX / 2 - 4, Game.Instance.ScreenCellsY / 2, "Game Over",
+            Color.White);
+
+        // Replace the current screen with the game over console
+        Game.Instance.Screen = gameOverConsole;
+    }
 
     private List<(Point, Point)> map1Walls = new List<(Point, Point)>
     {
         (new Point(0, 0), new Point(37, 0)),
-        (new Point(40,0),new Point(79,0)),
+        (new Point(40, 0), new Point(79, 0)),
         (new Point(0, 1), new Point(0, 19)),
         (new Point(0, 19), new Point(79, 19)),
         (new Point(79, 0), new Point(79, 19)),
@@ -164,15 +221,4 @@ public class RootScreen : ScreenObject
         (new Point(30, 15), new Point(40, 15)),
         (new Point(50, 18), new Point(60, 18)),
     };
-    
-    public void GameOver()
-    {
-        // Create a new console to display the message
-        var gameOverConsole = new Console(Game.Instance.ScreenCellsX, Game.Instance.ScreenCellsY);
-        gameOverConsole.Print(Game.Instance.ScreenCellsX / 2 - 4, Game.Instance.ScreenCellsY / 2, "Game Over", Color.White);
-        
-        // Replace the current screen with the game over console
-        Game.Instance.Screen = gameOverConsole;
-    }
-    
 }
