@@ -1,3 +1,4 @@
+using DungeonCrawl.InventoryServices;
 using DungeonCrawl.Maps;
 using DungeonCrawl.Tiles.MovableObjects;
 
@@ -5,8 +6,10 @@ namespace DungeonCrawl.Tiles;
 
 public class WeaponTile : GameObject
 {
-    public WeaponTile(Point position, IScreenSurface hostingSurface)
-        : base(new ColoredGlyph(Color.Blue, Color.Transparent, 15), position, hostingSurface)
+    private IItem _item;
+
+    public WeaponTile(Point position, IScreenSurface hostingSurface, IItem item)
+        : base(item.TileAppearance, position, hostingSurface)
     {
     }
 
@@ -16,8 +19,9 @@ public class WeaponTile : GameObject
         {
             if (source is Player player)
             {
-                player.PickUpWeapon();
+                player.PickUpWeapon(_item);
             }
+
             map.RemoveMapObject(this);
             return true;
         }

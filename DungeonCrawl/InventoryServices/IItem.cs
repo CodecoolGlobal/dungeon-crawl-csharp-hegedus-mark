@@ -5,4 +5,7 @@ namespace DungeonCrawl.InventoryServices;
 public interface IItem
 {
     public void Use(Point initialPosition,Direction direction, Map map);
+    
+    public ColoredGlyph TileAppearance { get; set; }
+    public string Name { get; set; }
 }

@@ -8,7 +8,7 @@ public class Inventory
     public const int InventorySlotHeight = 5;
     public const int InventorySlotGap = 5;
     public const int InventorySlotAmount = 5;
-    private List<Item> _items;
+    private List<IItem> _items;
     private List<InventorySlot> _itemSlots;
     public ScreenSurface SurfaceObject => _inventorySurface;
     private ScreenSurface _inventorySurface;
@@ -16,7 +16,7 @@ public class Inventory
     public Inventory(int width, int height)
     {
         _inventorySurface = new ScreenSurface(width, height);
-        _items = new List<Item>();
+        _items = new List<IItem>();
         _itemSlots = new List<InventorySlot>(InventorySlotAmount);
         DrawItemSlots(InventorySlotAmount);
     }
@@ -32,7 +32,7 @@ public class Inventory
         }
     }
 
-    public void AddItem(Item item)
+    public void AddItem(IItem item)
     {
         if (_items.Contains(item))
         {
@@ -44,7 +44,7 @@ public class Inventory
         _itemSlots[index].AddItem(item);
     }
 
-    public void RemoveItem(Item item)
+    public void RemoveItem(IItem item)
     {
         _items.Remove(item);
     }

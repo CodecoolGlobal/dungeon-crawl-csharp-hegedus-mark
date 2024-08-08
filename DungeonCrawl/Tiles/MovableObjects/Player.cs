@@ -18,13 +18,14 @@ namespace DungeonCrawl.Tiles.MovableObjects
         public Direction Direction { get; set; }
         public bool Stopped { get; set; } = true;
         private double _accumulatedCell = 0.0;
+        private Inventory _inventory;
 
         public Player(Point position, IScreenSurface hostingSurface)
             : base(new ColoredGlyph(Color.Green, Color.Transparent, 2), position, hostingSurface)
         {
         }
 
-        public void PickUpWeapon()
+        public void PickUpWeapon(IItem item)
         {
             return;
         }
@@ -54,12 +55,6 @@ namespace DungeonCrawl.Tiles.MovableObjects
 
         public override bool Touched(GameObject source, Map map)
         {
-            if (source is WeaponTile)
-            {
-                PickUpWeapon();
-                return true;
-            }
-
             if (source is Monster)
             {
                 new RootScreen().GameOver();

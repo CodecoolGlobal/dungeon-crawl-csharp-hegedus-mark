@@ -31,7 +31,7 @@ public class RootScreen : ScreenObject
         _inventory.AddItem(testItem);
 
         _currentMap = new Map(Game.Instance.ScreenCellsX, Game.Instance.ScreenCellsY - 5, map1Walls, this);
-        _currentMap.DrawElementsOnConsole(5, 5);
+        _currentMap.DrawElementsOnConsole(5, 5, map1Items);
 
         Children.Add(_currentMap.SurfaceObject);
         LoadInventory();
@@ -48,7 +48,7 @@ public class RootScreen : ScreenObject
     {
         Children.Remove(_currentMap.SurfaceObject);
         _currentMap = new Map(Game.Instance.ScreenCellsX, Game.Instance.ScreenCellsY - 5, map1Walls, this);
-        _currentMap.DrawElementsOnConsole(1, 20);
+        _currentMap.DrawElementsOnConsole(1, 20, map1Items);
         Children.Add(_currentMap.SurfaceObject);
     }
 
@@ -56,7 +56,7 @@ public class RootScreen : ScreenObject
     {
         Children.Remove(_currentMap.SurfaceObject);
         _currentMap = new Map(Game.Instance.ScreenCellsX, Game.Instance.ScreenCellsY - 5, map1Walls, this);
-        _currentMap.DrawElementsOnConsole(1, 20);
+        _currentMap.DrawElementsOnConsole(1, 20, map1Items);
         Children.Add(_currentMap.SurfaceObject);
     }
 
@@ -232,6 +232,11 @@ public class RootScreen : ScreenObject
         (new Point(10, 12), new Point(20, 12)),
         (new Point(30, 15), new Point(40, 15)),
         (new Point(50, 18), new Point(60, 18)),
+    };
+
+    private List<IItem> map1Items = new List<IItem>
+    {
+        new BasicWeapon("basic weapon", new ColoredGlyph(Color.Purple, Color.Purple), 5)
     };
 
     public void GameOver()

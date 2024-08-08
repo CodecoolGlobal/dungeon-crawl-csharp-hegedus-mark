@@ -5,7 +5,7 @@ namespace DungeonCrawl.InventoryServices;
 
 public class InventorySlot
 {
-    public Item Item = null;
+    public IItem Item = null;
     public ScreenSurface SurfaceObject => _slotSurface;
     private Console _slotSurface;
 
@@ -17,13 +17,13 @@ public class InventorySlot
             ShapeParameters.CreateStyledBoxThin(Color.Gray));
     }
 
-    public void AddItem(Item item)
+    public void AddItem(IItem item)
     {
         ChangeItemGlyph(item);
         _slotSurface.IsDirty = true;
     }
 
-    private void ChangeItemGlyph(Item item)
+    private void ChangeItemGlyph(IItem item)
     {
         var x = _slotSurface.Surface.Area.Center.X;
         var y = _slotSurface.Surface.Area.Center.Y;

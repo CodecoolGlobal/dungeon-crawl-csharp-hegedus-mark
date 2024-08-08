@@ -3,6 +3,7 @@ using DungeonCrawl.Tiles;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using DungeonCrawl.InventoryServices;
 using DungeonCrawl.Tiles.MovableObjects;
 using DungeonCrawl.Ui;
 
@@ -41,7 +42,7 @@ public class Map
         CoordinatesOfWalls(walls);
     }
 
-    public void DrawElementsOnConsole(int treasure, int monster)
+    public void DrawElementsOnConsole(int treasure, int monster, IEnumerable<IItem> items)
     {
         for (int i = 0; i < treasure; i++)
         {
@@ -53,11 +54,15 @@ public class Map
             CreateMonster();
         }
 
-        CreateWeapon();
+        foreach (var item in items)
+        {
+            CreateWeapon(item);
+        }
+
         CreateKey();
         CreateDoor();
     }
-    
+
 
     public void AddMapObject(GameObject mapObject)
     {
@@ -122,7 +127,8 @@ public class Map
             {
                 randomPosition = new Point(Game.Instance.Random.Next(0, _mapSurface.Surface.Width),
                     Game.Instance.Random.Next(0, _mapSurface.Surface.Height));
-            } while (Math.Abs(UserControlledObject.Position.X - randomPosition.X) <= 11 && Math.Abs(UserControlledObject.Position.Y - randomPosition.Y) <= 11);
+            } while (Math.Abs(UserControlledObject.Position.X - randomPosition.X) <= 11 &&
+                     Math.Abs(UserControlledObject.Position.Y - randomPosition.Y) <= 11);
 
 
             bool foundObject = _mapObjects.Any(obj => obj.Position == randomPosition);
@@ -138,7 +144,7 @@ public class Map
     private bool monsterMovementSwitch = false;
 
 
-    private void CreateWeapon()
+    private void CreateWeapon(IItem item)
     {
         for (int i = 0; i < 1000; i++)
         {
@@ -149,7 +155,7 @@ public class Map
             bool foundObject = _mapObjects.Any(obj => obj.Position == randomPosition);
             if (foundObject) continue;
 
-            GameObject Weapon = new WeaponTile(randomPosition, _mapSurface);
+            GameObject Weapon = new WeaponTile(randomPosition, _mapSurface, item);
             _mapObjects.Add(Weapon);
             break;
         }
