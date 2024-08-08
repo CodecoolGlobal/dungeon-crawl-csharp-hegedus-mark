@@ -39,7 +39,7 @@ namespace DungeonCrawl.Tiles.MovableObjects
 
         public void CountTreasure(Map map)
         {
-            if (Inventory.TreasuresCollected == 1)
+            if (Inventory.TreasuresCollected >= 10)
             {
                 RemoveSecretDoor(map);
             }

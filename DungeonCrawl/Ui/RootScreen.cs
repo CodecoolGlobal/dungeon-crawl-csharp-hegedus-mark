@@ -82,7 +82,7 @@ public class RootScreen : ScreenObject
         Children.Remove(_currentMap.SurfaceObject);
         _currentMap = new Map(Game.Instance.ScreenCellsX, Game.Instance.ScreenCellsY - 5, _map2Walls, this);
         SpawnPlayerOnMap(_currentMap, newPlayerPosition);
-        _currentMap.DrawElementsOnConsole(1, 1, RandomlyGeneratedItemToSpawn());
+        _currentMap.DrawElementsOnConsole(5, 10, RandomlyGeneratedItemToSpawn());
         Children.Add(_currentMap.SurfaceObject);
     }
 
@@ -190,8 +190,6 @@ public class RootScreen : ScreenObject
     private bool HandlePlayerMovement(Keyboard keyboard)
     {
         bool handled = false;
-
-        Point newPosition = _currentMap.UserControlledObject.Position;
         _currentMap.UserControlledObject.Stopped = false;
 
         bool up = keyboard.IsKeyDown(Keys.Up);
