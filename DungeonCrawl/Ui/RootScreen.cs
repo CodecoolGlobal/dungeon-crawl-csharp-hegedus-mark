@@ -36,7 +36,7 @@ public class RootScreen : ScreenObject
         _currentMap = new Map(Game.Instance.ScreenCellsX, Game.Instance.ScreenCellsY - 5, map1Walls, this);
         _player = new Player(_currentMap.SurfaceObject.Surface.Area.Center, _currentMap.SurfaceObject, _inventory);
         _currentMap.SpawnPlayer(_player);
-        _currentMap.DrawElementsOnConsole(5, 5, map1Items);
+        _currentMap.DrawElementsOnConsole(1, 5, map1Items);
 
         Children.Add(_currentMap.SurfaceObject);
         LoadInventory();
@@ -68,8 +68,8 @@ public class RootScreen : ScreenObject
     {
         Children.Remove(_currentMap.SurfaceObject);
         _currentMap = new Map(Game.Instance.ScreenCellsX, Game.Instance.ScreenCellsY - 5, mapSecret, this);
+        SpawnPlayerOnMap(_currentMap, newPlayerPosition);
         _currentMap.DrawElementsOnConsole(0, 0, map1Items);
-        _currentMap.UserControlledObject.Position = newPlayerPosition;
         Children.Add(_currentMap.SurfaceObject);
     }
 
@@ -105,6 +105,16 @@ public class RootScreen : ScreenObject
             else if (playerPos.Y == 0)
             {
                 ChangeToMap3(new Point(playerPos.X, currentMapHeight - 2));
+            }
+        }
+        else if (_currentMap.Walls == mapSecret)
+        {
+            if (playerPos.Y == 19)
+            {
+                ChangeToMap2(new Point(1,10));
+            }else if (playerPos.X == 79)
+            {
+                ChangeToMap2(new Point(1,10));
             }
         }
     }
@@ -336,10 +346,12 @@ public class RootScreen : ScreenObject
     {
         (new Point(0, 0), new Point(37, 0)),
         (new Point(40, 0), new Point(79, 0)),
-        (new Point(0, 1), new Point(0, 19)),
+        (new Point(0, 1), new Point(0, 9)),
+        (new Point(0,11),new Point(0,19)),
         (new Point(0, 19), new Point(37, 19)),
         (new Point(40, 19), new Point(79, 19)),
         (new Point(79, 0), new Point(79, 19)),
+        
 
 
         (new Point(10, 2), new Point(10, 17)),

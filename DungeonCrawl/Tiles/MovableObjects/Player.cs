@@ -28,15 +28,24 @@ namespace DungeonCrawl.Tiles.MovableObjects
             Health = 100;
         }
 
-        public void CollectTreasure()
+        public void CollectTreasure(Map map)
         {
             Inventory.TreasuresCollected++;
+            CountTreasure(map);
             System.Console.WriteLine($"Treasures collected: {Inventory.TreasuresCollected}");
         }
 
         public void PickUpWeapon(IItem item)
         {
             Inventory.AddItem(item);
+        }
+
+        public void CountTreasure(Map map)
+        {
+            if (Inventory.TreasuresCollected == 1)
+            {
+                RemoveSecretDoor(map);
+            }
         }
 
         public void PickUpKey(Map map)
@@ -53,6 +62,14 @@ namespace DungeonCrawl.Tiles.MovableObjects
                 map.RemoveMapObject(door);
             }
         }
+        private void RemoveSecretDoor(Map map)
+        {
+            var secretDoor = map.GameObjects.OfType<SecretDoor>().FirstOrDefault();
+            
+                map.RemoveMapObject(secretDoor);
+            
+        }
+        
 
         public bool HasKey => _hasKey;
 
