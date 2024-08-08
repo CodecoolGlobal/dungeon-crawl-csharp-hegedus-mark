@@ -9,9 +9,7 @@ namespace DungeonCrawl.Tiles.MovableObjects
 {
     public class Player : GameObject, IMovable
     {
-        public IItem CurrentlySelectedItem = new BasicWeapon("BasicWeapon",
-            new ColoredGlyph(Color.Blue, Color.Transparent, 257),
-            5);
+        public IItem CurrentlySelectedItem = new BasicWeapon();
 
         private bool _hasKey = false;
         public double Speed => 10;

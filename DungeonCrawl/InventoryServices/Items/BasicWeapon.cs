@@ -5,25 +5,20 @@ namespace DungeonCrawl.InventoryServices.Items;
 
 public class BasicWeapon : Item
 {
-    public ColoredGlyph TileAppearance { get; set; }
-    public string Name { get; set; }
-    private int _projectileSpeed;
-    private const int cooldown = 30;
-    private int currentCooldownCounter = 0;
+    private const int COOLDOWN = 30;
+    private int _currentCooldownCounter = 0;
+    private static readonly ColoredGlyph Appearance = new ColoredGlyph(Color.Silver, Color.Transparent, 224);
 
 
-    public BasicWeapon(string name, ColoredGlyph tileAppearance, int projectileSpeed) : base(name, tileAppearance)
+    public BasicWeapon() : base("Basic", Appearance)
     {
-        Name = name;
-        TileAppearance = tileAppearance;
-        _projectileSpeed = projectileSpeed;
     }
 
     public override void Use(Point playerPosition, Direction direction, Map map)
     {
-        if (currentCooldownCounter < cooldown)
+        if (_currentCooldownCounter < COOLDOWN)
         {
-            currentCooldownCounter++;
+            _currentCooldownCounter++;
             return;
         }
 
@@ -35,6 +30,6 @@ public class BasicWeapon : Item
             map.AddMapObject(projectile);
         }
 
-        currentCooldownCounter = 0;
+        _currentCooldownCounter = 0;
     }
 }

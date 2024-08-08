@@ -7,7 +7,7 @@ public class Projectile : GameObject, IMovable
 {
     public Direction Direction;
     private double _accumulatedCell = 0.0;
-    public double Speed => 20;
+    public virtual double Speed => 20;
     public int Attack;
 
 

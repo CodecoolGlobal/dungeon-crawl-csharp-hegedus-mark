@@ -3,7 +3,7 @@ using DungeonCrawl.Maps;
 
 namespace DungeonCrawl.Tiles.MovableObjects;
 
-public class BossProjectTile : Projectile, IMovable
+public class BossProjectTile : Projectile
 {
     private double _accumulatedCell = 0.0;
     public BossProjectTile(Point position, Direction direction, IScreenSurface hostingSurface) 

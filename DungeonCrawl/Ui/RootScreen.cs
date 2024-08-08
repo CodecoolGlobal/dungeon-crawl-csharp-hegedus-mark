@@ -27,8 +27,7 @@ public class RootScreen : ScreenObject
     /// </summary>
     public RootScreen()
     {
-        var testItem = new BasicWeapon("alma",
-            new ColoredGlyph(Color.Red, Color.Red), 5);
+        var testItem = new BasicWeapon();
 
         _inventory = new Inventory(Game.Instance.ScreenCellsX - 10, 5);
         _inventory.AddItem(testItem);
@@ -36,7 +35,7 @@ public class RootScreen : ScreenObject
         _currentMap = new Map(Game.Instance.ScreenCellsX, Game.Instance.ScreenCellsY - 5, map1Walls, this);
         _player = new Player(_currentMap.SurfaceObject.Surface.Area.Center, _currentMap.SurfaceObject, _inventory);
         _currentMap.SpawnPlayer(_player);
-        _currentMap.DrawElementsOnConsole(5, 5, map1Items);
+        _currentMap.DrawElementsOnConsole(5, 5, RandomlyGeneratedItemToSpawn());
 
         Children.Add(_currentMap.SurfaceObject);
         LoadInventory();
@@ -60,7 +59,7 @@ public class RootScreen : ScreenObject
         Children.Remove(_currentMap.SurfaceObject);
         _currentMap = new Map(Game.Instance.ScreenCellsX, Game.Instance.ScreenCellsY - 5, map2Walls, this);
         SpawnPlayerOnMap(_currentMap, newPlayerPosition);
-        _currentMap.DrawElementsOnConsole(1, 1, map1Items);
+        _currentMap.DrawElementsOnConsole(1, 1, RandomlyGeneratedItemToSpawn());
         Children.Add(_currentMap.SurfaceObject);
     }
 
@@ -68,7 +67,7 @@ public class RootScreen : ScreenObject
     {
         Children.Remove(_currentMap.SurfaceObject);
         _currentMap = new Map(Game.Instance.ScreenCellsX, Game.Instance.ScreenCellsY - 5, mapSecret, this);
-        _currentMap.DrawElementsOnConsole(0, 0, map1Items);
+        _currentMap.DrawElementsOnConsole(0, 0, RandomlyGeneratedItemToSpawn());
         _currentMap.UserControlledObject.Position = newPlayerPosition;
         Children.Add(_currentMap.SurfaceObject);
     }
@@ -78,7 +77,7 @@ public class RootScreen : ScreenObject
         Children.Remove(_currentMap.SurfaceObject);
         _currentMap = new Map(Game.Instance.ScreenCellsX, Game.Instance.ScreenCellsY - 5, map3Walls, this);
         SpawnPlayerOnMap(_currentMap, newPlayerPosition);
-        _currentMap.DrawElementsOnConsole(0, 0, map1Items, true);
+        _currentMap.DrawElementsOnConsole(0, 0, RandomlyGeneratedItemToSpawn(), true);
         Children.Add(_currentMap.SurfaceObject);
     }
 
@@ -292,6 +291,23 @@ public class RootScreen : ScreenObject
         return controlsConsole;
     }
 
+    public void GameOver()
+    {
+        // Create a new console to display the message
+        var gameOverConsole = new Console(Game.Instance.ScreenCellsX, Game.Instance.ScreenCellsY);
+        gameOverConsole.Print(Game.Instance.ScreenCellsX / 2 - 4, Game.Instance.ScreenCellsY / 2, "Game Over",
+            Color.White);
+
+        // Replace the current screen with the game over console
+        Game.Instance.Screen = gameOverConsole;
+    }
+
+    private IItem RandomlyGeneratedItemToSpawn()
+    {
+        var randomIndex = Game.Instance.Random.Next(SpawnableItems.Count);
+        return SpawnableItems[randomIndex];
+    }
+
 
     private List<(Point, Point)> map1Walls = new List<(Point, Point)>
     {
@@ -319,7 +335,7 @@ public class RootScreen : ScreenObject
 
     private List<IItem> map1Items = new List<IItem>
     {
-        new BasicWeapon("basic weapon", new ColoredGlyph(Color.Purple, Color.Purple), 5)
+        new BasicWeapon()
     };
 
 
@@ -366,14 +382,9 @@ public class RootScreen : ScreenObject
         (new Point(79, 11), new Point(79, 19)),
     };
 
-    public void GameOver()
-    {
-        // Create a new console to display the message
-        var gameOverConsole = new Console(Game.Instance.ScreenCellsX, Game.Instance.ScreenCellsY);
-        gameOverConsole.Print(Game.Instance.ScreenCellsX / 2 - 4, Game.Instance.ScreenCellsY / 2, "Game Over",
-            Color.White);
 
-        // Replace the current screen with the game over console
-        Game.Instance.Screen = gameOverConsole;
-    }
+    private List<IItem> SpawnableItems = new List<IItem>
+    {
+        new CircleWeapon(),
+    };
 }

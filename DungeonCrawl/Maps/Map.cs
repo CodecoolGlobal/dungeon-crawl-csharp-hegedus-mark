@@ -19,7 +19,6 @@ public class Map
     public Player UserControlledObject { get; set; }
     private List<GameObject> _mapObjects;
     public IEnumerable<IMovable> Movables => _mapObjects.OfType<IMovable>().ToList();
-    private List<GameObject> monsters => _mapObjects.Where(item => item is Monster).ToList();
     private ScreenSurface _mapSurface;
     private Wall singleWall;
     private Wall singleWall1;
@@ -48,7 +47,7 @@ public class Map
         _mapObjects.Add(player);
     }
 
-    public void DrawElementsOnConsole(int treasure, int monster, IEnumerable<IItem> items, bool bossLevel = false)
+    public void DrawElementsOnConsole(int treasure, int monster, IItem item, bool bossLevel = false)
     {
         for (int i = 0; i < treasure; i++)
         {
@@ -60,11 +59,7 @@ public class Map
             CreateMonster();
         }
 
-        foreach (var item in items)
-        {
-            CreateWeapon(item);
-        }
-
+        CreateWeapon(item);
         CreateKey();
         CreateDoor();
         CreateSecretDoor();
