@@ -9,6 +9,7 @@ public class BasicWeapon : Item
     public string Name { get; set; }
     private int _projectileSpeed;
     private const int cooldown = 30;
+    private int currentCooldownCounter = 0;
 
 
     public BasicWeapon(string name, ColoredGlyph tileAppearance, int projectileSpeed) : base(name, tileAppearance)
@@ -20,6 +21,12 @@ public class BasicWeapon : Item
 
     public override void Use(Point playerPosition, Direction direction, Map map)
     {
+        if (currentCooldownCounter < cooldown)
+        {
+            currentCooldownCounter++;
+            return;
+        }
+
         var initialProjectilePosition = playerPosition + direction;
         if (!map.TryGetMapObject(initialProjectilePosition, out _))
         {
@@ -27,5 +34,7 @@ public class BasicWeapon : Item
             Projectile projectile = new Projectile(initialProjectilePosition, direction, map.SurfaceObject);
             map.AddMapObject(projectile);
         }
+
+        currentCooldownCounter = 0;
     }
 }
