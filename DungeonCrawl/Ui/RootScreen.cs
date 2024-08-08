@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using DungeonCrawl.Maps;
 using SadConsole.Input;
 using DungeonCrawl.InventoryServices;
+using SadConsole.UI;
+using SadConsole.UI.Controls;
 using DungeonCrawl.InventoryServices.Items;
 using DungeonCrawl.Tiles.MovableObjects;
 
@@ -133,7 +135,7 @@ public class RootScreen : ScreenObject
 
         if (keyboard.IsKeyPressed(Keys.Escape) && !menuSwitch)
         {
-            Menu();
+            menu = Menu();
             Game.Instance.Screen.Children.Add(menu);
             menuSwitch = true;
         }
@@ -250,13 +252,42 @@ public class RootScreen : ScreenObject
         return handled;
     }
 
-    public Console Menu()
+    public ControlsConsole Menu()
     {
-        menu = new Console(Game.Instance.ScreenCellsX, Game.Instance.ScreenCellsY);
-        menu.Surface.DefaultBackground = Color.Black;
-        menu.Print(Game.Instance.ScreenCellsX / 2 - 10, Game.Instance.ScreenCellsY / 2, "This is the menu",
-            Color.White);
-        return menu;
+        // Create a ControlsConsole to manage UI elements
+        var controlsConsole = new ControlsConsole(Game.Instance.ScreenCellsX, Game.Instance.ScreenCellsY);
+        controlsConsole.Surface.Fill(Color.Black, Color.White, null);
+        controlsConsole.Clear();
+
+        // Print menu title directly on the ControlsConsole
+        controlsConsole.Print(Game.Instance.ScreenCellsX / 2 - 2, Game.Instance.ScreenCellsY / 2 - 2, "Menu", Color.White);
+
+        // Create a Quit button
+
+        var quitButton = new Button(20, 1)
+        {
+            Text = "Quit",
+            Position = new Point(Game.Instance.ScreenCellsX / 2 - 10, Game.Instance.ScreenCellsY / 2 + 2),
+        };
+        var saveButton = new Button(20, 1)
+        {
+            Text = "Save",
+            Position = new Point(Game.Instance.ScreenCellsX / 2 - 10, Game.Instance.ScreenCellsY / 2 + 4)
+        };
+
+
+        // Attach the click event to quit the game
+        quitButton.Click += (sender, e) =>
+        {
+            Environment.Exit(0);
+        };
+
+        // Add the button to the ControlsConsole
+        controlsConsole.Controls.Add(quitButton);
+        controlsConsole.Controls.Add(saveButton);
+
+        // Return the ControlsConsole as the menu
+        return controlsConsole;
     }
 
 
