@@ -11,6 +11,7 @@ public class WeaponTile : GameObject
     public WeaponTile(Point position, IScreenSurface hostingSurface, IItem item)
         : base(item.TileAppearance, position, hostingSurface)
     {
+        _item = item;
     }
 
     public override bool Touched(GameObject source, Map map)

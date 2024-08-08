@@ -8,6 +8,7 @@ public class BasicWeapon : Item
     public ColoredGlyph TileAppearance { get; set; }
     public string Name { get; set; }
     private int _projectileSpeed;
+    private const int cooldown = 30;
 
 
     public BasicWeapon(string name, ColoredGlyph tileAppearance, int projectileSpeed) : base(name, tileAppearance)

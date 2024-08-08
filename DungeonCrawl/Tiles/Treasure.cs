@@ -1,4 +1,5 @@
 ﻿using DungeonCrawl.Maps;
+using DungeonCrawl.Tiles.MovableObjects;
 using SadConsole;
 using SadRogue.Primitives;
 
@@ -25,8 +26,9 @@ public class Treasure : GameObject
     public override bool Touched(GameObject source, Map map)
     {
         // Is the player the one that touched us?
-        if (source == map.UserControlledObject)
+        if (source is Player player)
         {
+            player.CollectTreasure();
             map.RemoveMapObject(this);
             return true;
         }

@@ -18,19 +18,25 @@ namespace DungeonCrawl.Tiles.MovableObjects
         public Direction Direction { get; set; }
         public bool Stopped { get; set; } = true;
         private double _accumulatedCell = 0.0;
-        private Inventory _inventory;
+        public Inventory Inventory;
         public int Health;
 
         public Player(Point position, IScreenSurface hostingSurface, Inventory inventory)
             : base(new ColoredGlyph(Color.Green, Color.Transparent, 2), position, hostingSurface)
         {
-            _inventory = inventory;
+            Inventory = inventory;
             Health = 100;
+        }
+
+        public void CollectTreasure()
+        {
+            Inventory.TreasuresCollected++;
+            System.Console.WriteLine($"Treasures collected: {Inventory.TreasuresCollected}");
         }
 
         public void PickUpWeapon(IItem item)
         {
-            return;
+            Inventory.AddItem(item);
         }
 
         public void PickUpKey(Map map)

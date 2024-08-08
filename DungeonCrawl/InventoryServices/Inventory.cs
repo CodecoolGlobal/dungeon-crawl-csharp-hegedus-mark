@@ -10,6 +10,7 @@ public class Inventory
     public const int InventorySlotAmount = 5;
     private List<IItem> _items;
     private List<InventorySlot> _itemSlots;
+    public int TreasuresCollected;
     public ScreenSurface SurfaceObject => _inventorySurface;
     private ScreenSurface _inventorySurface;
 

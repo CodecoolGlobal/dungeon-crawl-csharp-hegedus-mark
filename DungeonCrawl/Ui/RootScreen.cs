@@ -225,22 +225,22 @@ public class RootScreen : ScreenObject
         bool handled = false;
 
 
-        if (keyboard.IsKeyPressed(Keys.A))
+        if (keyboard.IsKeyDown(Keys.A))
         {
             _currentMap.UserControlledObject.UseItem(Direction.Left, _currentMap);
             handled = true;
         }
-        else if (keyboard.IsKeyPressed(Keys.D))
+        else if (keyboard.IsKeyDown(Keys.D))
         {
             _currentMap.UserControlledObject.UseItem(Direction.Right, _currentMap);
             handled = true;
         }
-        else if (keyboard.IsKeyPressed(Keys.W))
+        else if (keyboard.IsKeyDown(Keys.W))
         {
             _currentMap.UserControlledObject.UseItem(Direction.Up, _currentMap);
             handled = true;
         }
-        else if (keyboard.IsKeyPressed(Keys.S))
+        else if (keyboard.IsKeyDown(Keys.S))
         {
             _currentMap.UserControlledObject.UseItem(Direction.Down, _currentMap);
             handled = true;
