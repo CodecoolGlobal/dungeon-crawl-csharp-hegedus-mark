@@ -52,6 +52,7 @@ public class Monster : GameObject, IMovable
             this.Appearance.Foreground = Color.Yellow;
             return Color.Yellow;
         }
+
         return Color.Red;
     }
 
@@ -84,17 +85,20 @@ public class Monster : GameObject, IMovable
 
     private void IsPlayerCloseToMonster(Map map)
     {
-        int minDistance = 10; // Define the distance within which monsters start moving towards the player
+        // Define the distance within which monsters start moving towards the player
+        int minDistance = 10;
         // Calculate the direction to move the monster one step closer to the player
         int moveX = _player.Position.X - Position.X;
         int moveY = _player.Position.Y - Position.Y;
-
+        
+        //Knowing your direction it will make 1 movement towards you in the XY axis.
         int stepX = moveX != 0 ? moveX / Math.Abs(moveX) : 0;
         int stepY = moveY != 0 ? moveY / Math.Abs(moveY) : 0;
-
-
+        
+        //checks if the monster should move in ziggzagging motion
         if (_zigzag)
         {
+            //Adds the ziggzagging motion to the monster
             if (_monsterZigZagController == 0 && Math.Abs(stepX) == 1 && stepY == 0)
             {
                 stepY = 1;
@@ -113,6 +117,7 @@ public class Monster : GameObject, IMovable
             }
         }
 
+        //Motor that counts from 0 to 2 and then back
         if (_monsterMovementSwitch)
         {
             _monsterZigZagController--;
@@ -131,6 +136,7 @@ public class Monster : GameObject, IMovable
             _monsterMovementSwitch = true;
         }
 
+        //This code checks if the monster is clost to player. If close it stops the ziggzagg motion
         if (Math.Abs(map.UserControlledObject.Position.Y - this.Position.Y) <= 3 &&
             Math.Abs(map.UserControlledObject.Position.X - this.Position.X) <= 3)
         {
@@ -141,8 +147,10 @@ public class Monster : GameObject, IMovable
             _zigzag = true;
         }
 
+        //Create the new position of the monster that is one step closer to you
         Point newPosition = new Point(Position.X + stepX, Position.Y + stepY);
 
+        //Checks if the monster is within minimal distance from you to start chasing you. Also it this code is responsible for the monster to keep continue chasing you, once you have triggered it.
         if (Math.Abs(moveX) <= minDistance && Math.Abs(moveY) <= minDistance || _chase)
         {
             _chase = true;

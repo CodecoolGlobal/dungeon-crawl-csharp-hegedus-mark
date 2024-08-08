@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using DungeonCrawl.Maps;
 using SadConsole.Input;
 using DungeonCrawl.InventoryServices;
+using SadConsole.UI.Controls;
 
 namespace DungeonCrawl.Ui;
 
@@ -206,8 +207,28 @@ public class RootScreen : ScreenObject
     {
         menu = new Console(Game.Instance.ScreenCellsX, Game.Instance.ScreenCellsY);
         menu.Surface.DefaultBackground = Color.Black;
-        menu.Print(Game.Instance.ScreenCellsX / 2 - 10, Game.Instance.ScreenCellsY / 2, "This is the menu",
-            Color.White);
+        menu.Clear();
+
+        // Print menu title
+        menu.Print(Game.Instance.ScreenCellsX / 2 - 10, Game.Instance.ScreenCellsY / 2 - 2, "This is the menu", Color.White);
+
+        // Create a Quit button
+        var quitButton = new Button(20, 1)
+        {
+            Text = "Quit",
+            Position = new Point(Game.Instance.ScreenCellsX / 2 - 10, Game.Instance.ScreenCellsY / 2 + 2),
+        };
+
+        // Attach the click event to quit the game
+        quitButton.Click += (sender, e) =>
+        {
+            Game.Instance.Dispose();
+            Environment.Exit(0);
+        };
+
+        // Add the button to the console
+        menu.Children.Add(quitButton);
+
         return menu;
     }
 
