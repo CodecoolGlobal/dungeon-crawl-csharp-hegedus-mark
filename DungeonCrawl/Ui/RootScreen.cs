@@ -33,7 +33,7 @@ public class RootScreen : ScreenObject
         _inventory.AddItem(testItem);
 
         _currentMap = new Map(Game.Instance.ScreenCellsX, Game.Instance.ScreenCellsY - 5, map1Walls, this);
-        _currentMap.DrawElementsOnConsole(5, 20);
+        _currentMap.DrawElementsOnConsole(5, 1);
 
         Children.Add(_currentMap.SurfaceObject);
         LoadInventory();
@@ -104,6 +104,7 @@ public class RootScreen : ScreenObject
         counter++;
         /*System.Console.WriteLine($"Counter: {counter}");*/
         var movables = _currentMap.Movables;
+        _currentMap.MoveBoss();
 
         foreach (var movableObject in movables)
         {

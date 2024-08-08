@@ -13,10 +13,12 @@ namespace DungeonCrawl.Tiles.MovableObjects
         public Direction Direction { get; set; }
         public bool Stopped { get; set; } = true;
         private double _accumulatedCell = 0.0;
+        public int Health;
 
         public Player(Point position, IScreenSurface hostingSurface)
             : base(new ColoredGlyph(Color.Green, Color.Transparent, 2), position, hostingSurface)
         {
+            Health = 100;
         }
 
         public void PickUpWeapon()
@@ -72,6 +74,19 @@ namespace DungeonCrawl.Tiles.MovableObjects
                 new RootScreen().GameOver();
                 return false;
             }
+            if (source is BossProjectTile bossProjectTile)
+            {
+                Health -= bossProjectTile.Attack;
+                if (Health <= 0)
+                {
+                    map._rootScreen.GameOver();
+                    
+                }
+
+                return false;
+            }
+
+            map.RemoveMapObject(this);
 
             return false;
         }

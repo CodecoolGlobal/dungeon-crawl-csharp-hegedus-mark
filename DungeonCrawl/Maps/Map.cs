@@ -22,7 +22,7 @@ public class Map
     private ScreenSurface _mapSurface;
     private Wall singleWall;
     private Wall singleWall1;
-    private RootScreen _rootScreen;
+    public RootScreen _rootScreen;
     public List<(Point, Point)> Walls { get; private set; }
 
     /// <summary>
@@ -243,5 +243,13 @@ public class Map
         Door door = new Door(doorPosition, _mapSurface);
         _mapObjects.Add(door);
         _mapObjects.Add(door1);
+    }
+    public void MoveBoss()
+    {
+        GameObject boss = _mapObjects.OfType<Boss>().FirstOrDefault();
+        if (boss != null)
+        {
+            ((Boss)boss).Shoot(this); 
+        }
     }
 }
