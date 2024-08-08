@@ -64,6 +64,15 @@ public class RootScreen : ScreenObject
         Children.Add(_currentMap.SurfaceObject);
     }
 
+    public void ChangeToSecretMap(Point newPlayerPosition)
+    {
+        Children.Remove(_currentMap.SurfaceObject);
+        _currentMap = new Map(Game.Instance.ScreenCellsX, Game.Instance.ScreenCellsY - 5, mapSecret, this);
+        _currentMap.DrawElementsOnConsole(0, 0, map1Items);
+        _currentMap.UserControlledObject.Position = newPlayerPosition;
+        Children.Add(_currentMap.SurfaceObject);
+    }
+
     public void ChangeToMap3(Point newPlayerPosition)
     {
         Children.Remove(_currentMap.SurfaceObject);
@@ -81,12 +90,7 @@ public class RootScreen : ScreenObject
 
         if (_currentMap.Walls == map1Walls)
         {
-            if (playerPos.X == 0)
-            {
-                ChangeToMap2(new Point(currentMapWidth - 2, playerPos.Y));
-            }
-
-            else if (playerPos.Y == 0)
+            if (playerPos.Y == 0)
             {
                 ChangeToMap2(new Point(playerPos.X, currentMapHeight - 2));
             }
@@ -95,7 +99,7 @@ public class RootScreen : ScreenObject
         {
             if (playerPos.X == 0)
             {
-                ChangeToMap3(new Point(currentMapWidth - 2, playerPos.Y));
+                ChangeToSecretMap(new Point(78, 10));
             }
 
             else if (playerPos.Y == 0)
@@ -260,7 +264,8 @@ public class RootScreen : ScreenObject
         controlsConsole.Clear();
 
         // Print menu title directly on the ControlsConsole
-        controlsConsole.Print(Game.Instance.ScreenCellsX / 2 - 2, Game.Instance.ScreenCellsY / 2 - 2, "Menu", Color.White);
+        controlsConsole.Print(Game.Instance.ScreenCellsX / 2 - 2, Game.Instance.ScreenCellsY / 2 - 2, "Menu",
+            Color.White);
 
         // Create a Quit button
 
@@ -277,10 +282,7 @@ public class RootScreen : ScreenObject
 
 
         // Attach the click event to quit the game
-        quitButton.Click += (sender, e) =>
-        {
-            Environment.Exit(0);
-        };
+        quitButton.Click += (sender, e) => { Environment.Exit(0); };
 
         // Add the button to the ControlsConsole
         controlsConsole.Controls.Add(quitButton);
@@ -353,6 +355,15 @@ public class RootScreen : ScreenObject
         (new Point(55, 10), new Point(65, 10)),
         (new Point(15, 12), new Point(25, 12)),
         (new Point(35, 15), new Point(45, 15)),
+    };
+
+    private List<(Point, Point)> mapSecret = new List<(Point, Point)>
+    {
+        (new Point(0, 0), new Point(79, 0)),
+        (new Point(0, 1), new Point(0, 19)),
+        (new Point(0, 19), new Point(79, 19)),
+        (new Point(79, 0), new Point(79, 9)),
+        (new Point(79, 11), new Point(79, 19)),
     };
 
     public void GameOver()
