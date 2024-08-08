@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 
 namespace DungeonCrawl.InventoryServices;
 
@@ -13,8 +14,10 @@ public class Inventory
     public static readonly Point CounterUiPosition = new Point(65, 0);
 
 
+    public IEnumerable<IItem> Items => _items;
     private List<IItem> _items;
     private List<InventorySlot> _itemSlots;
+    private InventorySlot _currentlySelectedSlot;
 
     private int _treasuresCollected;
 
@@ -35,7 +38,7 @@ public class Inventory
     public Inventory(int width, int height)
     {
         _inventorySurface = new ScreenSurface(width, height);
-        _items = new List<IItem>();
+        _items = new List<IItem>(5);
         _itemSlots = new List<InventorySlot>(InventorySlotAmount);
         DrawItemSlots(InventorySlotAmount);
         DrawCounterUi();
@@ -70,8 +73,18 @@ public class Inventory
         _itemSlots[index].AddItem(item);
     }
 
-    public void RemoveItem(IItem item)
+    public IItem SelectItem(int index)
     {
-        _items.Remove(item);
+        int safeIndex = index;
+        if (safeIndex > _items.Count - 1)
+        {
+            safeIndex = 0;
+        }
+
+        var selectedItem = _items[safeIndex];
+        _currentlySelectedSlot?.DeselectItemSlot();
+        _currentlySelectedSlot = _itemSlots.FirstOrDefault(slot => slot.Item == selectedItem);
+        _currentlySelectedSlot?.SelectItemSlot();
+        return _items[safeIndex];
     }
 }

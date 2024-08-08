@@ -19,7 +19,24 @@ public class InventorySlot
 
     public void AddItem(IItem item)
     {
+        Item = item;
         ChangeItemGlyph(item);
+        _slotSurface.IsDirty = true;
+    }
+
+    public void SelectItemSlot()
+    {
+        _slotSurface.DrawBox(new Rectangle(0, 0, SurfaceObject.Width, SurfaceObject.Height),
+            ShapeParameters.CreateStyledBoxThin(Color.Green));
+        ChangeItemGlyph(Item);
+        _slotSurface.IsDirty = true;
+    }
+
+    public void DeselectItemSlot()
+    {
+        _slotSurface.DrawBox(new Rectangle(0, 0, SurfaceObject.Width, SurfaceObject.Height),
+            ShapeParameters.CreateStyledBoxThin(Color.Gray));
+        ChangeItemGlyph(Item);
         _slotSurface.IsDirty = true;
     }
 

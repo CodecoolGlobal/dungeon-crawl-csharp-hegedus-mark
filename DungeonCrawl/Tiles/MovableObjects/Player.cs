@@ -9,32 +9,32 @@ namespace DungeonCrawl.Tiles.MovableObjects
 {
     public class Player : GameObject, IMovable
     {
-        public IItem CurrentlySelectedItem = new BasicWeapon();
 
         private bool _hasKey = false;
         public double Speed => 10;
         public Direction Direction { get; set; }
         public bool Stopped { get; set; } = true;
         private double _accumulatedCell = 0.0;
-        public Inventory Inventory;
+        public readonly Inventory PlayerInventory;
         public int Health;
+        public IItem CurrentlySelectedItem = new BasicWeapon();
 
-        public Player(Point position, IScreenSurface hostingSurface, Inventory inventory)
+        public Player(Point position, IScreenSurface hostingSurface, Inventory playerInventory)
             : base(new ColoredGlyph(Color.Green, Color.Transparent, 2), position, hostingSurface)
         {
-            Inventory = inventory;
+            PlayerInventory = playerInventory;
             Health = 100;
         }
 
         public void CollectTreasure()
         {
-            Inventory.TreasuresCollected++;
-            System.Console.WriteLine($"Treasures collected: {Inventory.TreasuresCollected}");
+            PlayerInventory.TreasuresCollected++;
+            System.Console.WriteLine($"Treasures collected: {PlayerInventory.TreasuresCollected}");
         }
 
         public void PickUpWeapon(IItem item)
         {
-            Inventory.AddItem(item);
+            PlayerInventory.AddItem(item);
         }
 
         public void PickUpKey(Map map)

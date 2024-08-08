@@ -6,7 +6,6 @@ namespace DungeonCrawl.InventoryServices.Items;
 public class BasicWeapon : Item
 {
     private const int COOLDOWN = 30;
-    private int _currentCooldownCounter = 0;
     private static readonly ColoredGlyph Appearance = new ColoredGlyph(Color.Silver, Color.Transparent, 224);
 
 
@@ -16,9 +15,8 @@ public class BasicWeapon : Item
 
     public override void Use(Point playerPosition, Direction direction, Map map)
     {
-        if (_currentCooldownCounter < COOLDOWN)
+        if (CurrentCooldownCounter < COOLDOWN)
         {
-            _currentCooldownCounter++;
             return;
         }
 
@@ -30,6 +28,6 @@ public class BasicWeapon : Item
             map.AddMapObject(projectile);
         }
 
-        _currentCooldownCounter = 0;
+        CurrentCooldownCounter = 0;
     }
 }

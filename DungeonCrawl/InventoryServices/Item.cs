@@ -5,6 +5,7 @@ namespace DungeonCrawl.InventoryServices;
 
 public abstract class Item : IItem
 {
+    protected int CurrentCooldownCounter = 0;
     public ColoredGlyph TileAppearance { get; set; }
     public string Name { get; set; }
 
@@ -15,4 +16,9 @@ public abstract class Item : IItem
     }
 
     public abstract void Use(Point playerPosition, Direction direction, Map map);
+
+    public void RefreshCooldown()
+    {
+        CurrentCooldownCounter++;
+    }
 }

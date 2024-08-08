@@ -6,7 +6,6 @@ namespace DungeonCrawl.InventoryServices.Items;
 public class CircleWeapon : Item
 {
     private const int COOLDOWN = 60;
-    private int _currentCooldownCounter = 0;
 
     private static readonly ColoredGlyph Appearance =
         new ColoredGlyph(Color.Blue, Color.Transparent, 233);
@@ -20,18 +19,18 @@ public class CircleWeapon : Item
     public CircleWeapon() : base("Circle", Appearance)
     {
     }
+    
 
     public override void Use(Point playerPosition, Direction direction, Map map)
     {
-        if (_currentCooldownCounter < COOLDOWN)
+        if (CurrentCooldownCounter < COOLDOWN)
         {
-            _currentCooldownCounter++;
             return;
         }
 
         foreach (var dir in _directions)
         {
-            var initialProjectilePosition = playerPosition + direction;
+            var initialProjectilePosition = playerPosition + dir;
             if (!map.TryGetMapObject(initialProjectilePosition, out _))
             {
                 // Create and add the projectile to the map
@@ -39,5 +38,7 @@ public class CircleWeapon : Item
                 map.AddMapObject(projectile);
             }
         }
+
+        CurrentCooldownCounter = 0;
     }
 }
