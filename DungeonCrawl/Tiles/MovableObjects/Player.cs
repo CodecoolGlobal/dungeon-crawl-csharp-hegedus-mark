@@ -9,17 +9,14 @@ namespace DungeonCrawl.Tiles.MovableObjects
 {
     public class Player : GameObject, IMovable
     {
-        public IItem CurrentlySelectedItem = new BasicWeapon("BasicWeapon",
-            new ColoredGlyph(Color.Blue, Color.Transparent, 257),
-            5);
-
         private bool _hasKey = false;
         public double Speed => 10;
         public Direction Direction { get; set; }
         public bool Stopped { get; set; } = true;
         private double _accumulatedCell = 0.0;
-        public Inventory Inventory;
+        public readonly Inventory Inventory;
         public int Health;
+        public IItem CurrentlySelectedItem = new BasicWeapon();
 
         public Player(Point position, IScreenSurface hostingSurface, Inventory inventory)
             : base(new ColoredGlyph(Color.Green, Color.Transparent, 2), position, hostingSurface)
@@ -28,15 +25,24 @@ namespace DungeonCrawl.Tiles.MovableObjects
             Health = 100;
         }
 
-        public void CollectTreasure()
+        public void CollectTreasure(Map map)
         {
             Inventory.TreasuresCollected++;
+            CountTreasure(map);
             System.Console.WriteLine($"Treasures collected: {Inventory.TreasuresCollected}");
         }
 
         public void PickUpWeapon(IItem item)
         {
             Inventory.AddItem(item);
+        }
+
+        public void CountTreasure(Map map)
+        {
+            if (Inventory.TreasuresCollected >= 10)
+            {
+                RemoveSecretDoor(map);
+            }
         }
 
         public void PickUpKey(Map map)
@@ -53,6 +59,14 @@ namespace DungeonCrawl.Tiles.MovableObjects
                 map.RemoveMapObject(door);
             }
         }
+
+        private void RemoveSecretDoor(Map map)
+        {
+            var secretDoor = map.GameObjects.OfType<SecretDoor>().FirstOrDefault();
+
+            map.RemoveMapObject(secretDoor);
+        }
+
 
         public bool HasKey => _hasKey;
 

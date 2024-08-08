@@ -17,9 +17,9 @@ public class RootScreen : ScreenObject
 {
     private Map _currentMap;
     private Inventory _inventory;
-    private int counter;
-    private bool menuSwitch = false;
-    private Console menu;
+    private int _counter;
+    private bool _menuSwitch = false;
+    private Console _menu;
     private Player _player;
 
     /// <summary>
@@ -27,25 +27,20 @@ public class RootScreen : ScreenObject
     /// </summary>
     public RootScreen()
     {
-        var testItem = new BasicWeapon("alma",
-            new ColoredGlyph(Color.Red, Color.Red), 5);
+        var starterWeapon = new BasicWeapon();
 
         _inventory = new Inventory(Game.Instance.ScreenCellsX - 10, 5);
-        _inventory.AddItem(testItem);
+        _inventory.AddItem(starterWeapon);
+        _inventory.SelectItem(0);
 
-        _currentMap = new Map(Game.Instance.ScreenCellsX, Game.Instance.ScreenCellsY - 5, map1Walls, this);
+        _currentMap = new Map(Game.Instance.ScreenCellsX, Game.Instance.ScreenCellsY - 5, _map1Walls, this);
         _player = new Player(_currentMap.SurfaceObject.Surface.Area.Center, _currentMap.SurfaceObject, _inventory);
+        _player.CurrentlySelectedItem = _inventory.SelectItem(0);
         _currentMap.SpawnPlayer(_player);
-        _currentMap.DrawElementsOnConsole(5, 5, map1Items);
 
+        _currentMap.DrawElementsOnConsole(5, 5, RandomlyGeneratedItemToSpawn());
         Children.Add(_currentMap.SurfaceObject);
         LoadInventory();
-    }
-
-    private void SpawnPlayerOnMap(Map map, Point newPosition)
-    {
-        _player = new Player(newPosition, map.SurfaceObject, _inventory);
-        map.SpawnPlayer(_player);
     }
 
     private void LoadInventory()
@@ -55,31 +50,66 @@ public class RootScreen : ScreenObject
         Children.Add(inventorySurface);
     }
 
+    public override void Update(TimeSpan timeElapsed)
+    {
+        base.Update(timeElapsed);
+        if (_menuSwitch) return;
+        _counter++;
+        /*System.Console.WriteLine($"Counter: {counter}");*/
+        var movables = _currentMap.Movables;
+        _currentMap.MoveBoss();
+
+        foreach (var movableObject in movables)
+        {
+            movableObject.Update(timeElapsed, _currentMap);
+        }
+
+        CheckPlayerPosition();
+        RefreshItemCooldowns();
+    }
+
+    private void RefreshItemCooldowns()
+    {
+        foreach (var item in _inventory.Items)
+        {
+            item.RefreshCooldown();
+        }
+    }
+
+
     public void ChangeToMap2(Point newPlayerPosition)
     {
         Children.Remove(_currentMap.SurfaceObject);
-        _currentMap = new Map(Game.Instance.ScreenCellsX, Game.Instance.ScreenCellsY - 5, map2Walls, this);
+        _currentMap = new Map(Game.Instance.ScreenCellsX, Game.Instance.ScreenCellsY - 5, _map2Walls, this);
         SpawnPlayerOnMap(_currentMap, newPlayerPosition);
-        _currentMap.DrawElementsOnConsole(1, 1, map1Items);
+        _currentMap.DrawElementsOnConsole(5, 10, RandomlyGeneratedItemToSpawn());
         Children.Add(_currentMap.SurfaceObject);
     }
 
     public void ChangeToSecretMap(Point newPlayerPosition)
     {
         Children.Remove(_currentMap.SurfaceObject);
-        _currentMap = new Map(Game.Instance.ScreenCellsX, Game.Instance.ScreenCellsY - 5, mapSecret, this);
-        _currentMap.DrawElementsOnConsole(0, 0, map1Items);
-        _currentMap.UserControlledObject.Position = newPlayerPosition;
+        _currentMap = new Map(Game.Instance.ScreenCellsX, Game.Instance.ScreenCellsY - 5, _mapSecret, this);
+        SpawnPlayerOnMap(_currentMap, newPlayerPosition);
+        _currentMap.DrawElementsOnConsole(0, 0, new UltimateWeapon());
         Children.Add(_currentMap.SurfaceObject);
     }
 
     public void ChangeToMap3(Point newPlayerPosition)
     {
         Children.Remove(_currentMap.SurfaceObject);
-        _currentMap = new Map(Game.Instance.ScreenCellsX, Game.Instance.ScreenCellsY - 5, map3Walls, this);
+        _currentMap = new Map(Game.Instance.ScreenCellsX, Game.Instance.ScreenCellsY - 5, _map3Walls, this);
         SpawnPlayerOnMap(_currentMap, newPlayerPosition);
-        _currentMap.DrawElementsOnConsole(0, 0, map1Items, true);
+        _currentMap.DrawElementsOnConsole(0, 0, null, true);
         Children.Add(_currentMap.SurfaceObject);
+    }
+
+    private void SpawnPlayerOnMap(Map map, Point newPosition)
+    {
+        var currentlySelectedItem = _player.CurrentlySelectedItem;
+        _player = new Player(newPosition, map.SurfaceObject, _inventory);
+        _player.CurrentlySelectedItem = currentlySelectedItem;
+        map.SpawnPlayer(_player);
     }
 
     public void CheckPlayerPosition()
@@ -88,14 +118,14 @@ public class RootScreen : ScreenObject
         var currentMapWidth = _currentMap.SurfaceObject.Surface.Width;
         var currentMapHeight = _currentMap.SurfaceObject.Surface.Height;
 
-        if (_currentMap.Walls == map1Walls)
+        if (_currentMap.Walls == _map1Walls)
         {
             if (playerPos.Y == 0)
             {
                 ChangeToMap2(new Point(playerPos.X, currentMapHeight - 2));
             }
         }
-        else if (_currentMap.Walls == map2Walls)
+        else if (_currentMap.Walls == _map2Walls)
         {
             if (playerPos.X == 0)
             {
@@ -107,23 +137,13 @@ public class RootScreen : ScreenObject
                 ChangeToMap3(new Point(playerPos.X, currentMapHeight - 2));
             }
         }
-    }
-
-    public override void Update(TimeSpan timeElapsed)
-    {
-        base.Update(timeElapsed);
-        if (menuSwitch) return;
-        counter++;
-        /*System.Console.WriteLine($"Counter: {counter}");*/
-        var movables = _currentMap.Movables;
-        _currentMap.MoveBoss();
-
-        foreach (var movableObject in movables)
+        else if (_currentMap.Walls == _mapSecret)
         {
-            movableObject.Update(timeElapsed, _currentMap);
+            if (playerPos.X == 79)
+            {
+                ChangeToMap2(new Point(1, 10));
+            }
         }
-
-        CheckPlayerPosition();
     }
 
 
@@ -137,22 +157,27 @@ public class RootScreen : ScreenObject
         bool handled = HandlePlayerInteraction(keyboard);
 
 
-        if (keyboard.IsKeyPressed(Keys.Escape) && !menuSwitch)
+        if (keyboard.IsKeyPressed(Keys.Escape) && !_menuSwitch)
         {
-            menu = Menu();
-            Game.Instance.Screen.Children.Add(menu);
-            menuSwitch = true;
+            _menu = Menu();
+            Game.Instance.Screen.Children.Add(_menu);
+            _menuSwitch = true;
         }
-        else if (keyboard.IsKeyPressed(Keys.Escape) && menuSwitch)
+        else if (keyboard.IsKeyPressed(Keys.Escape) && _menuSwitch)
         {
             System.Console.WriteLine("TURN OFF MENU");
-            Game.Instance.Screen.Children.Remove(menu);
-            menuSwitch = false;
+            Game.Instance.Screen.Children.Remove(_menu);
+            _menuSwitch = false;
         }
 
-        if (keyboard.IsKeyPressed(Keys.NumPad1))
+        if (keyboard.IsKeyPressed(Keys.Home))
         {
             ChangeToMap3(new Point(40, 19));
+        }
+
+        if (keyboard.IsKeyPressed(Keys.End))
+        {
+            _inventory.AddItem(new UltimateWeapon());
         }
 
         return handled;
@@ -162,15 +187,14 @@ public class RootScreen : ScreenObject
     {
         bool movementHandled = HandlePlayerMovement(keyboard);
         bool shootingHandled = HandlePlayerShoot(keyboard);
+        bool inventoryHandled = HandlePlayerInventorySelection(keyboard);
 
-        return movementHandled || shootingHandled;
+        return movementHandled || shootingHandled || inventoryHandled;
     }
 
     private bool HandlePlayerMovement(Keyboard keyboard)
     {
         bool handled = false;
-
-        Point newPosition = _currentMap.UserControlledObject.Position;
         _currentMap.UserControlledObject.Stopped = false;
 
         bool up = keyboard.IsKeyDown(Keys.Up);
@@ -256,6 +280,43 @@ public class RootScreen : ScreenObject
         return handled;
     }
 
+    private bool HandlePlayerInventorySelection(Keyboard keyboard)
+    {
+        bool handled = false;
+
+        if (keyboard.IsKeyPressed(Keys.NumPad1))
+        {
+            _player.CurrentlySelectedItem = _inventory.SelectItem(0);
+            handled = true;
+        }
+
+        if (keyboard.IsKeyPressed(Keys.NumPad2))
+        {
+            _player.CurrentlySelectedItem = _inventory.SelectItem(1);
+            handled = true;
+        }
+
+        if (keyboard.IsKeyPressed(Keys.NumPad3))
+        {
+            _player.CurrentlySelectedItem = _inventory.SelectItem(2);
+            handled = true;
+        }
+
+        if (keyboard.IsKeyPressed(Keys.NumPad4))
+        {
+            _player.CurrentlySelectedItem = _inventory.SelectItem(3);
+            handled = true;
+        }
+
+        if (keyboard.IsKeyPressed(Keys.NumPad5))
+        {
+            _player.CurrentlySelectedItem = _inventory.SelectItem(4);
+            handled = true;
+        }
+
+        return handled;
+    }
+
     public ControlsConsole Menu()
     {
         // Create a ControlsConsole to manage UI elements
@@ -292,8 +353,32 @@ public class RootScreen : ScreenObject
         return controlsConsole;
     }
 
+    public void GameOver()
+    {
+        // Create a new console to display the message
+        var gameOverConsole = new Console(Game.Instance.ScreenCellsX, Game.Instance.ScreenCellsY);
+        gameOverConsole.Print(Game.Instance.ScreenCellsX / 2 - 4, Game.Instance.ScreenCellsY / 2, "Game Over",
+            Color.White);
 
-    private List<(Point, Point)> map1Walls = new List<(Point, Point)>
+        // Replace the current screen with the game over console
+        Game.Instance.Screen = gameOverConsole;
+    }
+
+    private IItem RandomlyGeneratedItemToSpawn()
+    {
+        if (_spawnableItems.Count == 0)
+        {
+            return new BasicWeapon();
+        }
+
+        var randomIndex = Game.Instance.Random.Next(_spawnableItems.Count);
+        var selectedItem = _spawnableItems[randomIndex];
+        _spawnableItems.Remove(selectedItem);
+        return selectedItem;
+    }
+
+
+    private List<(Point, Point)> _map1Walls = new List<(Point, Point)>
     {
         (new Point(0, 0), new Point(37, 0)),
         (new Point(40, 0), new Point(79, 0)),
@@ -317,13 +402,8 @@ public class RootScreen : ScreenObject
         (new Point(50, 18), new Point(60, 18)),
     };
 
-    private List<IItem> map1Items = new List<IItem>
-    {
-        new BasicWeapon("basic weapon", new ColoredGlyph(Color.Purple, Color.Purple), 5)
-    };
 
-
-    private List<(Point, Point)> map3Walls = new List<(Point, Point)>
+    private List<(Point, Point)> _map3Walls = new List<(Point, Point)>
     {
         (new Point(0, 0), new Point(79, 0)),
         (new Point(0, 1), new Point(0, 19)),
@@ -332,11 +412,12 @@ public class RootScreen : ScreenObject
         (new Point(79, 0), new Point(79, 19)),
     };
 
-    private List<(Point, Point)> map2Walls = new List<(Point, Point)>
+    private List<(Point, Point)> _map2Walls = new List<(Point, Point)>
     {
         (new Point(0, 0), new Point(37, 0)),
         (new Point(40, 0), new Point(79, 0)),
-        (new Point(0, 1), new Point(0, 19)),
+        (new Point(0, 1), new Point(0, 9)),
+        (new Point(0, 11), new Point(0, 19)),
         (new Point(0, 19), new Point(37, 19)),
         (new Point(40, 19), new Point(79, 19)),
         (new Point(79, 0), new Point(79, 19)),
@@ -357,7 +438,7 @@ public class RootScreen : ScreenObject
         (new Point(35, 15), new Point(45, 15)),
     };
 
-    private List<(Point, Point)> mapSecret = new List<(Point, Point)>
+    private List<(Point, Point)> _mapSecret = new List<(Point, Point)>
     {
         (new Point(0, 0), new Point(79, 0)),
         (new Point(0, 1), new Point(0, 19)),
@@ -366,14 +447,11 @@ public class RootScreen : ScreenObject
         (new Point(79, 11), new Point(79, 19)),
     };
 
-    public void GameOver()
-    {
-        // Create a new console to display the message
-        var gameOverConsole = new Console(Game.Instance.ScreenCellsX, Game.Instance.ScreenCellsY);
-        gameOverConsole.Print(Game.Instance.ScreenCellsX / 2 - 4, Game.Instance.ScreenCellsY / 2, "Game Over",
-            Color.White);
 
-        // Replace the current screen with the game over console
-        Game.Instance.Screen = gameOverConsole;
-    }
+    private List<IItem> _spawnableItems = new List<IItem>
+    {
+        new CircleWeapon(),
+        new FastWeapon(),
+        new WaveWeapon()
+    };
 }

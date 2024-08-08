@@ -3,13 +3,14 @@ using DungeonCrawl.Tiles.MovableObjects;
 
 namespace DungeonCrawl.InventoryServices.Items;
 
-public class BasicWeapon : Item
+public class FastWeapon : Item
 {
-    private const int COOLDOWN = 30;
-    private static readonly ColoredGlyph Appearance = new ColoredGlyph(Color.Silver, Color.Transparent, 224);
+    private const int COOLDOWN = 10;
 
+    private static readonly ColoredGlyph Appearance =
+        new ColoredGlyph(Color.Orange, Color.Transparent, 228);
 
-    public BasicWeapon() : base("Basic", Appearance)
+    public FastWeapon() : base("Fast", Appearance)
     {
     }
 
@@ -24,7 +25,7 @@ public class BasicWeapon : Item
         if (!map.TryGetMapObject(initialProjectilePosition, out _))
         {
             // Create and add the projectile to the map
-            Projectile projectile = new Projectile(initialProjectilePosition, direction, map.SurfaceObject, Color.Silver);
+            FastProjectile projectile = new FastProjectile(initialProjectilePosition, direction, map.SurfaceObject, Color.Orange);
             map.AddMapObject(projectile);
         }
 

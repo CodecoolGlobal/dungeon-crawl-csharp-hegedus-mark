@@ -8,7 +8,9 @@ namespace DungeonCrawl.Tiles
 {
     public class Boss : GameObject
     {
+        private static int StarterHp = 500;
         public int BossHealth { get; private set; }
+
         private int _shootTimer;
         private readonly int _shootCooldown;
 
@@ -16,7 +18,7 @@ namespace DungeonCrawl.Tiles
             : base(new ColoredGlyph(Color.Red, Color.Transparent, 'B'), position, hostingSurface)
         {
             BossHealth = 500;
-            _shootCooldown = 70; 
+            _shootCooldown = 70;
             _shootTimer = _shootCooldown;
         }
 
@@ -31,9 +33,11 @@ namespace DungeonCrawl.Tiles
                     map.RemoveMapObject(this);
                 }
 
+                map.SurfaceObject.SetForeground(this.Position.X, this.Position.Y, ChangeColorAsPerHp(this.BossHealth));
+                map.SurfaceObject.IsDirty = true;
                 return true;
             }
-
+            
             return false;
         }
 
@@ -52,6 +56,29 @@ namespace DungeonCrawl.Tiles
             }
         }
 
+        private Color ChangeColorAsPerHp(double hp)
+        {
+            double hpRatio = hp / StarterHp;
+            System.Console.WriteLine(hpRatio);
+            if (hpRatio <= 0.25)
+            {
+                this.Appearance.Foreground = Color.Blue;
+                return Color.Blue;
+            }
+            else if (hpRatio <= 0.5)
+            {
+                this.Appearance.Foreground = Color.Purple;
+                return Color.Purple;
+            }
+            else if (hpRatio <= 0.75)
+            {
+                this.Appearance.Foreground = Color.Yellow;
+                return Color.Yellow;
+            }
+
+            return Color.Red;
+        }
+
         private void MoveTowardsPlayer(Map map)
         {
             int moveX = map.UserControlledObject.Position.X - Position.X;
@@ -67,8 +94,7 @@ namespace DungeonCrawl.Tiles
                 Move(newPosition, map);
             }
         }
-        
-        
+
 
         public void Shoot(Map map)
         {

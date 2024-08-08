@@ -6,20 +6,23 @@ namespace DungeonCrawl.Tiles;
 public class SecretDoor : GameObject
 {
     public SecretDoor(Point position, IScreenSurface hostingSurface)
-        : base(new ColoredGlyph(Color.Pink, Color.Transparent, '#'), position, hostingSurface)
+        : base(new ColoredGlyph(Color.YellowGreen, Color.Transparent, '#'), position, hostingSurface)
     {
     }
     
     public override bool Touched(GameObject source, Map map)
     {
-        /*if (source == map.UserControlledObject)
+        if (source == map.UserControlledObject)
         {
-            if ()
-            {
-                map.RemoveMapObject(this);
-                return true;
-            }
-        }*/
+            var player = (Player)source;
+            
+                if (player.Inventory.TreasuresCollected >= 1)
+                {
+                    map.RemoveMapObject(this);
+                    return true;
+                }
+            
+        }
 
         return false;
     }
