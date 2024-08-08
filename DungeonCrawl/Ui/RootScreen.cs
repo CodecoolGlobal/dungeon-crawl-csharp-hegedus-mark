@@ -32,7 +32,7 @@ public class RootScreen : ScreenObject
         _inventory = new Inventory(Game.Instance.ScreenCellsX - 10, 5);
         _inventory.AddItem(testItem);
 
-        _currentMap = new Map(Game.Instance.ScreenCellsX, Game.Instance.ScreenCellsY - 5, map1Walls, this);
+        _currentMap = new Map(Game.Instance.ScreenCellsX, Game.Instance.ScreenCellsY - 5, map2Walls, this);
         _currentMap.DrawElementsOnConsole(5, 1);
 
         Children.Add(_currentMap.SurfaceObject);
@@ -55,6 +55,15 @@ public class RootScreen : ScreenObject
         Children.Add(_currentMap.SurfaceObject);
     }
 
+    public void ChangeToSecretMap(Point newPlayerPosition)
+    {
+        Children.Remove(_currentMap.SurfaceObject);
+        _currentMap = new Map(Game.Instance.ScreenCellsX, Game.Instance.ScreenCellsY - 5, mapSecret, this);
+        _currentMap.DrawElementsOnConsole(0, 0);
+        _currentMap.UserControlledObject.Position = newPlayerPosition;
+        Children.Add(_currentMap.SurfaceObject);
+    }
+
     public void ChangeToMap3(Point newPlayerPosition)
     {
         Children.Remove(_currentMap.SurfaceObject);
@@ -72,29 +81,23 @@ public class RootScreen : ScreenObject
 
         if (_currentMap.Walls == map1Walls)
         {
-            if (playerPos.X == 0)
-            {
-                ChangeToMap2(new Point(currentMapWidth - 2, playerPos.Y));
-            }
-            
-            else if (playerPos.Y == 0)
+            if (playerPos.Y == 0)
             {
                 ChangeToMap2(new Point(playerPos.X, currentMapHeight - 2));
             }
-
-        }else if (_currentMap.Walls == map2Walls)
+        }
+        else if (_currentMap.Walls == map2Walls)
         {
             if (playerPos.X == 0)
             {
-                ChangeToMap3(new Point(currentMapWidth - 2, playerPos.Y));
+                ChangeToSecretMap(new Point(78, 10));
             }
-            
+
             else if (playerPos.Y == 0)
             {
                 ChangeToMap3(new Point(playerPos.X, currentMapHeight - 2));
             }
         }
-        
     }
 
     public override void Update(TimeSpan timeElapsed)
@@ -110,6 +113,7 @@ public class RootScreen : ScreenObject
         {
             movableObject.Update(timeElapsed, _currentMap);
         }
+
         CheckPlayerPosition();
     }
 
@@ -123,7 +127,7 @@ public class RootScreen : ScreenObject
     {
         bool handled = HandlePlayerInteraction(keyboard);
 
-       
+
         if (keyboard.IsKeyPressed(Keys.Escape) && !menuSwitch)
         {
             Menu();
@@ -151,7 +155,7 @@ public class RootScreen : ScreenObject
     private bool HandlePlayerMovement(Keyboard keyboard)
     {
         bool handled = false;
-        
+
         Point newPosition = _currentMap.UserControlledObject.Position;
         _currentMap.UserControlledObject.Stopped = false;
 
@@ -211,7 +215,7 @@ public class RootScreen : ScreenObject
     private bool HandlePlayerShoot(Keyboard keyboard)
     {
         bool handled = false;
-        
+
 
         if (keyboard.IsKeyPressed(Keys.A))
         {
@@ -286,11 +290,12 @@ public class RootScreen : ScreenObject
     {
         (new Point(0, 0), new Point(37, 0)),
         (new Point(40, 0), new Point(79, 0)),
-        (new Point(0, 1), new Point(0, 19)),
+        (new Point(0, 1), new Point(0, 9)), // 0,10 titkos ajtó
+        (new Point(0, 11), new Point(0, 19)),
         (new Point(0, 19), new Point(37, 19)),
         (new Point(40, 19), new Point(79, 19)),
         (new Point(79, 0), new Point(79, 19)),
-        
+
 
         (new Point(10, 2), new Point(10, 17)),
         (new Point(20, 2), new Point(20, 17)),
@@ -307,6 +312,15 @@ public class RootScreen : ScreenObject
         (new Point(35, 15), new Point(45, 15)),
     };
 
+    private List<(Point, Point)> mapSecret = new List<(Point, Point)>
+    {
+        (new Point(0, 0), new Point(79, 0)),
+        (new Point(0, 1), new Point(0, 19)),
+        (new Point(0, 19), new Point(79, 19)),
+        (new Point(79, 0), new Point(79, 9)),
+        (new Point(79, 11), new Point(79, 19)),
+    };
+
     public void GameOver()
     {
         // Create a new console to display the message
@@ -317,5 +331,4 @@ public class RootScreen : ScreenObject
         // Replace the current screen with the game over console
         Game.Instance.Screen = gameOverConsole;
     }
-    
 }

@@ -58,6 +58,7 @@ public class Map
         CreateWeapon();
         CreateKey();
         CreateDoor();
+        CreateSecretDoor();
 
         if (bossLevel)
         {
@@ -244,12 +245,20 @@ public class Map
         _mapObjects.Add(door);
         _mapObjects.Add(door1);
     }
+
+    private void CreateSecretDoor()
+    {
+        Point secretDoorPosition = new Point(0, 10);
+        SecretDoor secretDoor = new SecretDoor(secretDoorPosition,_mapSurface);
+        _mapObjects.Add(secretDoor);
+    }
     public void MoveBoss()
     {
         GameObject boss = _mapObjects.OfType<Boss>().FirstOrDefault();
         if (boss != null)
         {
-            ((Boss)boss).Shoot(this); 
+            ((Boss)boss).UpdateBossShootMove(this); 
+            ((Boss)boss).UpdateBossShootMove(this);
         }
     }
 }
