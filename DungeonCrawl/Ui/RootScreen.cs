@@ -14,6 +14,8 @@ public class RootScreen : ScreenObject
     private Map _currentMap;
     private Inventory _inventory;
     private int counter;
+    private bool menuSwitch = false;
+    private Console menu;
 
     /// <summary>
     /// Constructor.
@@ -23,7 +25,7 @@ public class RootScreen : ScreenObject
         var testItem = new Item
         {
             ForegroundColor = Color.Beige,
-            GlyphIndex = 6,
+            GlyphIndex = 1,
             Name = "Test"
         };
 
@@ -48,7 +50,7 @@ public class RootScreen : ScreenObject
     {
         Children.Remove(_currentMap.SurfaceObject);
         _currentMap = new Map(Game.Instance.ScreenCellsX, Game.Instance.ScreenCellsY - 5, map2Walls, this);
-        _currentMap.DrawElementsOnConsole(1, 20);
+        _currentMap.DrawElementsOnConsole(1, 1);
         _currentMap.UserControlledObject.Position = newPlayerPosition;
         Children.Add(_currentMap.SurfaceObject);
     }
@@ -98,46 +100,117 @@ public class RootScreen : ScreenObject
     public override void Update(TimeSpan timeElapsed)
     {
         base.Update(timeElapsed);
-
+        if (menuSwitch) return;
         counter++;
         System.Console.WriteLine($"Counter: {counter}");
-        _currentMap.MoveProjectiles();
+        var movables = _currentMap.Movables;
+
+        foreach (var movableObject in movables)
+        {
+            movableObject.Update(timeElapsed, _currentMap);
+        }
         CheckPlayerPosition();
     }
 
+
+    /// <summary>
+    /// Processes keyboard inputs.
+    /// </summary>
+    /// <param name="keyboard"></param>
+    /// <returns></returns>
     public override bool ProcessKeyboard(Keyboard keyboard)
+    {
+        bool handled = HandlePlayerInteraction(keyboard);
+
+       
+        if (keyboard.IsKeyPressed(Keys.Escape) && !menuSwitch)
+        {
+            Menu();
+            Game.Instance.Screen.Children.Add(menu);
+            menuSwitch = true;
+        }
+        else if (keyboard.IsKeyPressed(Keys.Escape) && menuSwitch)
+        {
+            System.Console.WriteLine("TURN OFF MENU");
+            Game.Instance.Screen.Children.Remove(menu);
+            menuSwitch = false;
+        }
+
+        return handled;
+    }
+
+    private bool HandlePlayerInteraction(Keyboard keyboard)
+    {
+        bool movementHandled = HandlePlayerMovement(keyboard);
+        bool shootingHandled = HandlePlayerShoot(keyboard);
+
+        return movementHandled || shootingHandled;
+    }
+
+    private bool HandlePlayerMovement(Keyboard keyboard)
     {
         bool handled = false;
         
         Point newPosition = _currentMap.UserControlledObject.Position;
+        _currentMap.UserControlledObject.Stopped = false;
 
-        if (keyboard.IsKeyPressed(Keys.Up))
+        bool up = keyboard.IsKeyDown(Keys.Up);
+        bool down = keyboard.IsKeyDown(Keys.Down);
+        bool left = keyboard.IsKeyDown(Keys.Left);
+        bool right = keyboard.IsKeyDown(Keys.Right);
+
+        if (up && left)
         {
-            newPosition += Direction.Up;
+            _currentMap.UserControlledObject.Direction = Direction.UpLeft;
             handled = true;
         }
-        else if (keyboard.IsKeyPressed(Keys.Down))
+        else if (up && right)
         {
-            newPosition += Direction.Down;
+            _currentMap.UserControlledObject.Direction = Direction.UpRight;
             handled = true;
         }
-        else if (keyboard.IsKeyPressed(Keys.Left))
+        else if (down && left)
         {
-            newPosition += Direction.Left;
+            _currentMap.UserControlledObject.Direction = Direction.DownLeft;
             handled = true;
         }
-        else if (keyboard.IsKeyPressed(Keys.Right))
+        else if (down && right)
         {
-            newPosition += Direction.Right;
+            _currentMap.UserControlledObject.Direction = Direction.DownRight;
             handled = true;
+        }
+        else if (up)
+        {
+            _currentMap.UserControlledObject.Direction = Direction.Up;
+            handled = true;
+        }
+        else if (down)
+        {
+            _currentMap.UserControlledObject.Direction = Direction.Down;
+            handled = true;
+        }
+        else if (left)
+        {
+            _currentMap.UserControlledObject.Direction = Direction.Left;
+            handled = true;
+        }
+        else if (right)
+        {
+            _currentMap.UserControlledObject.Direction = Direction.Right;
+            handled = true;
+        }
+        else
+        {
+            _currentMap.UserControlledObject.Stopped = true;
         }
 
-        // Mozgást figyeli
-        if (handled)
-        {
-            _currentMap.UserControlledObject.Move(newPosition, _currentMap);
-            CheckPlayerPosition();
-        }
+        return handled;
+    }
+
+    private bool HandlePlayerShoot(Keyboard keyboard)
+    {
+        bool handled = false;
+        
 
         if (keyboard.IsKeyPressed(Keys.A))
         {
@@ -160,8 +233,19 @@ public class RootScreen : ScreenObject
             handled = true;
         }
 
+
         return handled;
     }
+
+    public Console Menu()
+    {
+        menu = new Console(Game.Instance.ScreenCellsX, Game.Instance.ScreenCellsY);
+        menu.Surface.DefaultBackground = Color.Black;
+        menu.Print(Game.Instance.ScreenCellsX / 2 - 10, Game.Instance.ScreenCellsY / 2, "This is the menu",
+            Color.White);
+        return menu;
+    }
+
 
     private List<(Point, Point)> map1Walls = new List<(Point, Point)>
     {
@@ -186,6 +270,7 @@ public class RootScreen : ScreenObject
         (new Point(30, 15), new Point(40, 15)),
         (new Point(50, 18), new Point(60, 18)),
     };
+
 
     private List<(Point, Point)> map3Walls = new List<(Point, Point)>
     {
@@ -231,4 +316,5 @@ public class RootScreen : ScreenObject
         // Replace the current screen with the game over console
         Game.Instance.Screen = gameOverConsole;
     }
+    
 }

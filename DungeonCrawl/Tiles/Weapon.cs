@@ -1,4 +1,6 @@
 using DungeonCrawl.Maps;
+using DungeonCrawl.Tiles.MovableObjects;
+
 namespace DungeonCrawl.Tiles;
 
 public class Weapon : GameObject
@@ -7,6 +9,7 @@ public class Weapon : GameObject
         : base(new ColoredGlyph(Color.Blue, Color.Transparent, 15), position, hostingSurface)
     {
     }
+
     public override bool Touched(GameObject source, Map map)
     {
         if (source == map.UserControlledObject)
