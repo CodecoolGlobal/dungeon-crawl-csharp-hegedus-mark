@@ -1,10 +1,11 @@
+using System.Runtime.CompilerServices;
 using Microsoft.VisualBasic.CompilerServices;
 
 namespace DungeonCrawl.InventoryServices;
 
 public class InventorySlot
 {
-    public Item Item = null;
+    public IItem Item = null;
     public ScreenSurface SurfaceObject => _slotSurface;
     private Console _slotSurface;
 
@@ -16,20 +17,18 @@ public class InventorySlot
             ShapeParameters.CreateStyledBoxThin(Color.Gray));
     }
 
-    public void AddItem(Item item)
+    public void AddItem(IItem item)
     {
         ChangeItemGlyph(item);
         _slotSurface.IsDirty = true;
     }
 
-    private void ChangeItemGlyph(Item item)
+    private void ChangeItemGlyph(IItem item)
     {
         var x = _slotSurface.Surface.Area.Center.X;
         var y = _slotSurface.Surface.Area.Center.Y;
         var height = _slotSurface.Height;
         _slotSurface.Print(0, height - 1, item.Name, Color.Yellow);
-        _slotSurface.SetGlyph(x, y, item.GlyphIndex);
-        _slotSurface.SetForeground(x, y, item.ForegroundColor);
-        _slotSurface.SetBackground(x, y, item.BackgroundColor);
+        _slotSurface.SetCellAppearance(x, y, item.TileAppearance);
     }
 }

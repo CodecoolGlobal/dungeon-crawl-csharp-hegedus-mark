@@ -1,5 +1,7 @@
 using System;
 using System.Linq;
+using DungeonCrawl.InventoryServices;
+using DungeonCrawl.InventoryServices.Items;
 using DungeonCrawl.Maps;
 using DungeonCrawl.Ui;
 
@@ -7,21 +9,34 @@ namespace DungeonCrawl.Tiles.MovableObjects
 {
     public class Player : GameObject, IMovable
     {
-        private bool _hasWeapon = false;
+        public IItem CurrentlySelectedItem = new BasicWeapon("BasicWeapon",
+            new ColoredGlyph(Color.Blue, Color.Transparent, 257),
+            5);
+
         private bool _hasKey = false;
         public double Speed => 10;
         public Direction Direction { get; set; }
         public bool Stopped { get; set; } = true;
         private double _accumulatedCell = 0.0;
+        public Inventory Inventory;
+        public int Health;
 
-        public Player(Point position, IScreenSurface hostingSurface)
+        public Player(Point position, IScreenSurface hostingSurface, Inventory inventory)
             : base(new ColoredGlyph(Color.Green, Color.Transparent, 2), position, hostingSurface)
         {
+            Inventory = inventory;
+            Health = 100;
         }
 
-        public void PickUpWeapon()
+        public void CollectTreasure()
         {
-            _hasWeapon = true;
+            Inventory.TreasuresCollected++;
+            System.Console.WriteLine($"Treasures collected: {Inventory.TreasuresCollected}");
+        }
+
+        public void PickUpWeapon(IItem item)
+        {
+            Inventory.AddItem(item);
         }
 
         public void PickUpKey(Map map)
@@ -42,36 +57,31 @@ namespace DungeonCrawl.Tiles.MovableObjects
         public bool HasKey => _hasKey;
 
 
-        public void Shoot(Direction direction, Map map)
+        public void UseItem(Direction direction, Map map)
         {
-            if (_hasWeapon)
-            {
-                // Compute the initial position based on the direction
-                Point initialPosition = Position + direction;
-
-                // Check if the position is free of map objects
-                if (!map.TryGetMapObject(initialPosition, out _))
-                {
-                    // Create and add the projectile to the map
-                    Projectile projectile = new Projectile(initialPosition, direction, map.SurfaceObject);
-                    map.AddMapObject(projectile);
-                }
-            }
+            CurrentlySelectedItem.Use(Position, direction, map);
         }
 
         public override bool Touched(GameObject source, Map map)
         {
-            if (source is Weapon)
-            {
-                PickUpWeapon();
-                return true;
-            }
-
             if (source is Monster)
             {
                 new RootScreen().GameOver();
                 return false;
             }
+
+            if (source is BossProjectTile bossProjectTile)
+            {
+                Health -= bossProjectTile.Attack;
+                if (Health <= 0)
+                {
+                    map._rootScreen.GameOver();
+                }
+
+                return false;
+            }
+
+            map.RemoveMapObject(this);
 
             return false;
         }

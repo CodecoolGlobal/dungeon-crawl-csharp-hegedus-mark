@@ -3,6 +3,7 @@ using DungeonCrawl.Tiles;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using DungeonCrawl.InventoryServices;
 using DungeonCrawl.Tiles.MovableObjects;
 using DungeonCrawl.Ui;
 
@@ -15,14 +16,15 @@ public class Map
 {
     public IReadOnlyList<GameObject> GameObjects => _mapObjects.AsReadOnly();
     public ScreenSurface SurfaceObject => _mapSurface;
-    public Player UserControlledObject { get; private set; }
+    public Player UserControlledObject { get; set; }
     private List<GameObject> _mapObjects;
     public IEnumerable<IMovable> Movables => _mapObjects.OfType<IMovable>().ToList();
     private List<GameObject> monsters => _mapObjects.Where(item => item is Monster).ToList();
     private ScreenSurface _mapSurface;
     private Wall singleWall;
     private Wall singleWall1;
-    private RootScreen _rootScreen;
+    public RootScreen _rootScreen;
+    public List<(Point, Point)> Walls { get; private set; }
 
     /// <summary>
     /// Constructor.
@@ -36,12 +38,17 @@ public class Map
         _mapSurface = new ScreenSurface(mapWidth, mapHeight);
         _mapSurface.UseMouse = false;
 
-        UserControlledObject = new Player(_mapSurface.Surface.Area.Center, _mapSurface);
-        _mapObjects.Add(UserControlledObject);
         CoordinatesOfWalls(walls);
+        Walls = walls;
     }
 
-    public void DrawElementsOnConsole(int treasure, int monster)
+    public void SpawnPlayer(Player player)
+    {
+        UserControlledObject = player;
+        _mapObjects.Add(player);
+    }
+
+    public void DrawElementsOnConsole(int treasure, int monster, IEnumerable<IItem> items, bool bossLevel = false)
     {
         for (int i = 0; i < treasure; i++)
         {
@@ -53,11 +60,28 @@ public class Map
             CreateMonster();
         }
 
-        CreateWeapon();
+        foreach (var item in items)
+        {
+            CreateWeapon(item);
+        }
+
         CreateKey();
         CreateDoor();
+        CreateSecretDoor();
+
+        if (bossLevel)
+        {
+            CreateBoss();
+        }
     }
-    
+
+    public void CreateBoss()
+    {
+        Point BossPosition = new Point(_mapSurface.Surface.Width / 2, _mapSurface.Surface.Height / 2);
+        GameObject boss = new Boss(BossPosition, _mapSurface);
+        _mapObjects.Add(boss);
+    }
+
 
     public void AddMapObject(GameObject mapObject)
     {
@@ -117,8 +141,14 @@ public class Map
     {
         for (int i = 0; i < 1000; i++)
         {
-            Point randomPosition = new Point(Game.Instance.Random.Next(0, _mapSurface.Surface.Width),
-                Game.Instance.Random.Next(0, _mapSurface.Surface.Height));
+            Point randomPosition;
+            do
+            {
+                randomPosition = new Point(Game.Instance.Random.Next(0, _mapSurface.Surface.Width),
+                    Game.Instance.Random.Next(0, _mapSurface.Surface.Height));
+            } while (Math.Abs(UserControlledObject.Position.X - randomPosition.X) <= 11 &&
+                     Math.Abs(UserControlledObject.Position.Y - randomPosition.Y) <= 11);
+
 
             bool foundObject = _mapObjects.Any(obj => obj.Position == randomPosition);
             if (foundObject) continue;
@@ -133,7 +163,7 @@ public class Map
     private bool monsterMovementSwitch = false;
 
 
-    private void CreateWeapon()
+    private void CreateWeapon(IItem item)
     {
         for (int i = 0; i < 1000; i++)
         {
@@ -144,7 +174,7 @@ public class Map
             bool foundObject = _mapObjects.Any(obj => obj.Position == randomPosition);
             if (foundObject) continue;
 
-            GameObject Weapon = new Weapon(randomPosition, _mapSurface);
+            GameObject Weapon = new WeaponTile(randomPosition, _mapSurface, item);
             _mapObjects.Add(Weapon);
             break;
         }
@@ -224,5 +254,23 @@ public class Map
         Door door = new Door(doorPosition, _mapSurface);
         _mapObjects.Add(door);
         _mapObjects.Add(door1);
+    }
+
+
+    private void CreateSecretDoor()
+    {
+        Point secretDoorPosition = new Point(0, 10);
+        SecretDoor secretDoor = new SecretDoor(secretDoorPosition, _mapSurface);
+        _mapObjects.Add(secretDoor);
+    }
+
+    public void MoveBoss()
+    {
+        GameObject boss = _mapObjects.OfType<Boss>().FirstOrDefault();
+        if (boss != null)
+        {
+            ((Boss)boss).UpdateBossShootMove(this);
+            ((Boss)boss).UpdateBossShootMove(this);
+        }
     }
 }

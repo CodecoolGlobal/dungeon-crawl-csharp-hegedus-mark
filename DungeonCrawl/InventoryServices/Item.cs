@@ -1,11 +1,18 @@
+using System;
+using DungeonCrawl.Maps;
+
 namespace DungeonCrawl.InventoryServices;
 
-public class Item
+public abstract class Item : IItem
 {
-    public Color ForegroundColor { get; set; }
-    public Color BackgroundColor { get; set; }
-    public int GlyphIndex { get; set; }
+    public ColoredGlyph TileAppearance { get; set; }
     public string Name { get; set; }
-    
-    
+
+    protected Item(string name, ColoredGlyph tileAppearance)
+    {
+        Name = name;
+        TileAppearance = tileAppearance;
+    }
+
+    public abstract void Use(Point playerPosition, Direction direction, Map map);
 }
