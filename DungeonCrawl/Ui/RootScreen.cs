@@ -15,6 +15,8 @@ public class RootScreen : ScreenObject
 {
     private Map _map;
     private int counter;
+    private bool menuSwitch = false;
+    private Console menu;
 
     /// <summary>
     /// Constructor.
@@ -45,7 +47,7 @@ public class RootScreen : ScreenObject
         base.Update(timeElapsed);
 
         counter++;
-        System.Console.WriteLine($"Counter: {counter}");
+        /*System.Console.WriteLine($"Counter: {counter}");*/
         _map.MoveProjectiles();
     }
 
@@ -81,7 +83,6 @@ public class RootScreen : ScreenObject
             handled = true;
         }
 
-
         if (keyboard.IsKeyPressed(Keys.A))
         {
             _map.UserControlledObject.Shoot(Direction.Left, _map);
@@ -102,6 +103,19 @@ public class RootScreen : ScreenObject
             _map.UserControlledObject.Shoot(Direction.Down, _map);
             handled = true;
         }
+        else if (keyboard.IsKeyPressed(Keys.Escape) && !menuSwitch)
+        {
+            Menu();
+            Game.Instance.Screen.Children.Add(menu);
+            menuSwitch = true;
+
+        }
+        else if (keyboard.IsKeyPressed(Keys.Escape) && menuSwitch)
+        {
+            System.Console.WriteLine("TURN OFF MENU");
+            Game.Instance.Screen.Children.Remove(menu);
+            menuSwitch = false;
+        }
 
         if (handled)
         {
@@ -111,11 +125,19 @@ public class RootScreen : ScreenObject
         return handled;
     }
 
+    public Console Menu()
+    {
+        menu = new Console(Game.Instance.ScreenCellsX, Game.Instance.ScreenCellsY);
+        menu.Surface.DefaultBackground = Color.Black;
+        menu.Print(Game.Instance.ScreenCellsX / 2 - 10, Game.Instance.ScreenCellsY / 2, "This is the menu", Color.White);
+        return menu;
+    }
+
 
     private List<(Point, Point)> map1Walls = new List<(Point, Point)>
     {
         (new Point(0, 0), new Point(37, 0)),
-        (new Point(40,0),new Point(79,0)),
+        (new Point(40, 0), new Point(79, 0)),
         (new Point(0, 1), new Point(0, 19)),
         (new Point(0, 19), new Point(79, 19)),
         (new Point(79, 0), new Point(79, 19)),
@@ -135,15 +157,15 @@ public class RootScreen : ScreenObject
         (new Point(30, 15), new Point(40, 15)),
         (new Point(50, 18), new Point(60, 18)),
     };
-    
+
     public void GameOver()
     {
         // Create a new console to display the message
         var gameOverConsole = new Console(Game.Instance.ScreenCellsX, Game.Instance.ScreenCellsY);
-        gameOverConsole.Print(Game.Instance.ScreenCellsX / 2 - 4, Game.Instance.ScreenCellsY / 2, "Game Over", Color.White);
-        
+        gameOverConsole.Print(Game.Instance.ScreenCellsX / 2 - 4, Game.Instance.ScreenCellsY / 2, "Game Over",
+            Color.White);
+
         // Replace the current screen with the game over console
         Game.Instance.Screen = gameOverConsole;
     }
-    
 }
