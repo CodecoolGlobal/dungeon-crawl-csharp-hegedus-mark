@@ -1,4 +1,5 @@
 using DungeonCrawl.Maps;
+using DungeonCrawl.Tiles.MovableObjects;
 using SadConsole;
 using SadRogue.Primitives;
 

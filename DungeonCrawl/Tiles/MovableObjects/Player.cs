@@ -2,16 +2,17 @@ using System;
 using System.Linq;
 using DungeonCrawl.Maps;
 using DungeonCrawl.Ui;
-using SadConsole;
-using SadRogue.Primitives;
 
-
-namespace DungeonCrawl.Tiles
+namespace DungeonCrawl.Tiles.MovableObjects
 {
-    public class Player : GameObject
+    public class Player : GameObject, IMovable
     {
         private bool _hasWeapon = false;
         private bool _hasKey = false;
+        public double Speed => 10;
+        public Direction Direction { get; set; }
+        public bool Stopped { get; set; } = true;
+        private double _accumulatedCell = 0.0;
 
         public Player(Point position, IScreenSurface hostingSurface)
             : base(new ColoredGlyph(Color.Green, Color.Transparent, 2), position, hostingSurface)
@@ -74,6 +75,20 @@ namespace DungeonCrawl.Tiles
 
             return false;
         }
+
+
+        public void Update(TimeSpan timeElapsed, Map map)
+        {
+            if (Stopped) return;
+            if (_accumulatedCell > 1)
+            {
+                var newPosition = Position + Direction;
+                Move(newPosition, map);
+                _accumulatedCell = 0.0;
+                return;
+            }
+
+            _accumulatedCell += Speed * timeElapsed.TotalSeconds;
+        }
     }
-    
 }
