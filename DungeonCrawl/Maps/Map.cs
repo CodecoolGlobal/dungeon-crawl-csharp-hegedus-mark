@@ -144,7 +144,7 @@ public class Map
             bool foundObject = _mapObjects.Any(obj => obj.Position == randomPosition);
             if (foundObject) continue;
 
-            GameObject Weapon = new Weapon(randomPosition, _mapSurface);
+            GameObject Weapon = new WeaponTile(randomPosition, _mapSurface);
             _mapObjects.Add(Weapon);
             break;
         }

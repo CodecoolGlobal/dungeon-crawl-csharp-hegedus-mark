@@ -1,5 +1,7 @@
 using System;
 using System.Linq;
+using DungeonCrawl.InventoryServices;
+using DungeonCrawl.InventoryServices.Items;
 using DungeonCrawl.Maps;
 using DungeonCrawl.Ui;
 
@@ -7,7 +9,10 @@ namespace DungeonCrawl.Tiles.MovableObjects
 {
     public class Player : GameObject, IMovable
     {
-        private bool _hasWeapon = false;
+        public IItem CurrentlySelectedItem = new BasicWeapon("BasicWeapon",
+            new ColoredGlyph(Color.Blue, Color.Transparent, 257),
+            5);
+
         private bool _hasKey = false;
         public double Speed => 10;
         public Direction Direction { get; set; }
@@ -21,7 +26,7 @@ namespace DungeonCrawl.Tiles.MovableObjects
 
         public void PickUpWeapon()
         {
-            _hasWeapon = true;
+            return;
         }
 
         public void PickUpKey(Map map)
@@ -42,26 +47,14 @@ namespace DungeonCrawl.Tiles.MovableObjects
         public bool HasKey => _hasKey;
 
 
-        public void Shoot(Direction direction, Map map)
+        public void UseItem(Direction direction, Map map)
         {
-            if (_hasWeapon)
-            {
-                // Compute the initial position based on the direction
-                Point initialPosition = Position + direction;
-
-                // Check if the position is free of map objects
-                if (!map.TryGetMapObject(initialPosition, out _))
-                {
-                    // Create and add the projectile to the map
-                    Projectile projectile = new Projectile(initialPosition, direction, map.SurfaceObject);
-                    map.AddMapObject(projectile);
-                }
-            }
+            CurrentlySelectedItem.Use(Position, direction, map);
         }
 
         public override bool Touched(GameObject source, Map map)
         {
-            if (source is Weapon)
+            if (source is WeaponTile)
             {
                 PickUpWeapon();
                 return true;

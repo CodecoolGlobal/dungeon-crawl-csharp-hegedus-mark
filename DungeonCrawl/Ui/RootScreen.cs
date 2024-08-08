@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using DungeonCrawl.Maps;
 using SadConsole.Input;
 using DungeonCrawl.InventoryServices;
+using DungeonCrawl.InventoryServices.Items;
 
 namespace DungeonCrawl.Ui;
 
@@ -22,12 +23,9 @@ public class RootScreen : ScreenObject
     /// </summary>
     public RootScreen()
     {
-        var testItem = new Item
-        {
-            ForegroundColor = Color.Beige,
-            GlyphIndex = 1,
-            Name = "Test"
-        };
+        var testItem = new BasicWeapon("alma",
+            new ColoredGlyph(Color.Red, Color.Red), 5);
+
 
         _inventory = new Inventory(Game.Instance.ScreenCellsX - 10, 5);
         _inventory.AddItem(testItem);
@@ -179,22 +177,22 @@ public class RootScreen : ScreenObject
 
         if (keyboard.IsKeyPressed(Keys.A))
         {
-            _currentMap.UserControlledObject.Shoot(Direction.Left, _currentMap);
+            _currentMap.UserControlledObject.UseItem(Direction.Left, _currentMap);
             handled = true;
         }
         else if (keyboard.IsKeyPressed(Keys.D))
         {
-            _currentMap.UserControlledObject.Shoot(Direction.Right, _currentMap);
+            _currentMap.UserControlledObject.UseItem(Direction.Right, _currentMap);
             handled = true;
         }
         else if (keyboard.IsKeyPressed(Keys.W))
         {
-            _currentMap.UserControlledObject.Shoot(Direction.Up, _currentMap);
+            _currentMap.UserControlledObject.UseItem(Direction.Up, _currentMap);
             handled = true;
         }
         else if (keyboard.IsKeyPressed(Keys.S))
         {
-            _currentMap.UserControlledObject.Shoot(Direction.Down, _currentMap);
+            _currentMap.UserControlledObject.UseItem(Direction.Down, _currentMap);
             handled = true;
         }
 

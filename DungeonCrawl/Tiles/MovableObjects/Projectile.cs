@@ -43,17 +43,7 @@ public class Projectile : GameObject, IMovable
         DisplayMoveOnScreen(newPosition, map);
         return true;
     }
-
-    public void HitSomething(GameObject source, Map map)
-    {
-        if (source is Monster)
-        {
-            map.RemoveMapObject(source);
-        }
-
-        map.RemoveMapObject(this);
-    }
-
+    
     public void Update(TimeSpan timeElapsed, Map map)
     {
         if (_accumulatedCell > 1)

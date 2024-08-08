@@ -3,9 +3,9 @@ using DungeonCrawl.Tiles.MovableObjects;
 
 namespace DungeonCrawl.Tiles;
 
-public class Weapon : GameObject
+public class WeaponTile : GameObject
 {
-    public Weapon(Point position, IScreenSurface hostingSurface)
+    public WeaponTile(Point position, IScreenSurface hostingSurface)
         : base(new ColoredGlyph(Color.Blue, Color.Transparent, 15), position, hostingSurface)
     {
     }

@@ -39,8 +39,8 @@ public class Inventory
             return;
         }
 
-        _items.Add(item);
         int index = _items.Count;
+        _items.Add(item);
         _itemSlots[index].AddItem(item);
     }
 
