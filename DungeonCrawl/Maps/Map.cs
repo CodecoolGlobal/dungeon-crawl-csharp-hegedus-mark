@@ -16,14 +16,15 @@ public class Map
 {
     public IReadOnlyList<GameObject> GameObjects => _mapObjects.AsReadOnly();
     public ScreenSurface SurfaceObject => _mapSurface;
-    public Player UserControlledObject { get; private set; }
+    public Player UserControlledObject { get; set; }
     private List<GameObject> _mapObjects;
     public IEnumerable<IMovable> Movables => _mapObjects.OfType<IMovable>().ToList();
     private List<GameObject> monsters => _mapObjects.Where(item => item is Monster).ToList();
     private ScreenSurface _mapSurface;
     private Wall singleWall;
     private Wall singleWall1;
-    private RootScreen _rootScreen;
+    public RootScreen _rootScreen;
+    public List<(Point, Point)> Walls { get; private set; }
 
     /// <summary>
     /// Constructor.
@@ -37,12 +38,17 @@ public class Map
         _mapSurface = new ScreenSurface(mapWidth, mapHeight);
         _mapSurface.UseMouse = false;
 
-        UserControlledObject = new Player(_mapSurface.Surface.Area.Center, _mapSurface);
-        _mapObjects.Add(UserControlledObject);
         CoordinatesOfWalls(walls);
+        Walls = walls;
     }
 
-    public void DrawElementsOnConsole(int treasure, int monster, IEnumerable<IItem> items)
+    public void SpawnPlayer(Player player)
+    {
+        UserControlledObject = player;
+        _mapObjects.Add(player);
+    }
+
+    public void DrawElementsOnConsole(int treasure, int monster, IEnumerable<IItem> items, bool bossLevel = false)
     {
         for (int i = 0; i < treasure; i++)
         {
@@ -61,6 +67,18 @@ public class Map
 
         CreateKey();
         CreateDoor();
+
+        if (bossLevel)
+        {
+            CreateBoss();
+        }
+    }
+
+    public void CreateBoss()
+    {
+        Point BossPosition = new Point(_mapSurface.Surface.Width / 2, _mapSurface.Surface.Height / 2);
+        GameObject boss = new Boss(BossPosition, _mapSurface);
+        _mapObjects.Add(boss);
     }
 
 
@@ -235,5 +253,14 @@ public class Map
         Door door = new Door(doorPosition, _mapSurface);
         _mapObjects.Add(door);
         _mapObjects.Add(door1);
+    }
+
+    public void MoveBoss()
+    {
+        GameObject boss = _mapObjects.OfType<Boss>().FirstOrDefault();
+        if (boss != null)
+        {
+            ((Boss)boss).Shoot(this);
+        }
     }
 }

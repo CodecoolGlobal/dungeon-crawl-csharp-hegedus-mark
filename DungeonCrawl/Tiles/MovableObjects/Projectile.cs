@@ -23,6 +23,7 @@ public class Projectile : GameObject, IMovable
         if (!map.SurfaceObject.Surface.IsValidCell(newPosition.X, newPosition.Y))
         {
             map.RemoveMapObject(this);
+            return false;
         }
 
         if (map.TryGetMapObject(newPosition, out GameObject foundObject))

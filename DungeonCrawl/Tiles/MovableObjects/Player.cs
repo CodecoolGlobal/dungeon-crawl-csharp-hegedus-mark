@@ -19,10 +19,13 @@ namespace DungeonCrawl.Tiles.MovableObjects
         public bool Stopped { get; set; } = true;
         private double _accumulatedCell = 0.0;
         private Inventory _inventory;
+        public int Health;
 
-        public Player(Point position, IScreenSurface hostingSurface)
+        public Player(Point position, IScreenSurface hostingSurface, Inventory inventory)
             : base(new ColoredGlyph(Color.Green, Color.Transparent, 2), position, hostingSurface)
         {
+            _inventory = inventory;
+            Health = 100;
         }
 
         public void PickUpWeapon(IItem item)
@@ -60,6 +63,19 @@ namespace DungeonCrawl.Tiles.MovableObjects
                 new RootScreen().GameOver();
                 return false;
             }
+
+            if (source is BossProjectTile bossProjectTile)
+            {
+                Health -= bossProjectTile.Attack;
+                if (Health <= 0)
+                {
+                    map._rootScreen.GameOver();
+                }
+
+                return false;
+            }
+
+            map.RemoveMapObject(this);
 
             return false;
         }
